@@ -15,28 +15,14 @@ on:
 
 # job definitions
 jobs:
-  # runs pylint
-  lint:
-    name: Execute pylint
+  run_pylint:
     runs-on: ubuntu-latest
-
-    # job steps
+    name: Execute pylint
     steps:
-      # checkout the codebase
-      - name: Checkout the repository
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v1
 
-      # cache the docker layers. this has a known issue so continue on error is ok
-      - uses: satackey/action-docker-layer-caching@v0.0.8
-        continue-on-error: true
-
-      # build the image
-      - name: Build docker image
-        run: docker build -t archiver-testing -f Dockerfile.test .
-
-      # run pylint
-      - name: Run pylint and get the output
-        run: |
-          echo 'LINT_OUTPUT<<EOF' >> $GITHUB_ENV
-          echo "$(docker run archiver-testing pylint --rcfile=.pylintrc --recursive=y ./)" >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
+      - name: Python Pylint GitHub Action
+        uses: fylein/python-pylint-github-action@v1
+        with:
+          args: pip3 install -r requirements.txt && pylint --rcfile=.pylintrc --recursive=y ./
