@@ -12,7 +12,7 @@ LABEL maintainer="powen@renci.org"
 
 # install basic tools
 RUN apt-get update
-RUN apt-get install -yq vim procps
+#RUN apt-get install -yq vim procps
 
 # update pip
 RUN pip install --upgrade pip
