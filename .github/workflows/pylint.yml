@@ -1,0 +1,42 @@
+# SPDX-FileCopyrightText: 2022 Renaissance Computing Institute. All rights reserved.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-License-Identifier: LicenseRef-RENCI
+# SPDX-License-Identifier: MIT
+
+name: Pylint and Pytest the codebase
+
+# trigger event is a push to the main repo branch (or a manual launch)
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+
+# job definitions
+jobs:
+  # runs pylint
+  lint:
+    name: Execute pylint
+    runs-on: ubuntu-latest
+
+    # job steps
+    steps:
+      # checkout the codebase
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      # cache the docker layers. this has a known issue so continue on error is ok
+      - uses: satackey/action-docker-layer-caching@v0.0.8
+        continue-on-error: true
+
+      # build the image
+      - name: Build docker image
+        run: docker build -t archiver-testing -f Dockerfile.test .
+
+      # run pylint
+      - name: Run pylint and get the output
+        run: |
+          echo 'LINT_OUTPUT<<EOF' >> $GITHUB_ENV
+          echo "$(docker run archiver-testing pylint --rcfile=.pylintrc --recursive=y ./)" >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
