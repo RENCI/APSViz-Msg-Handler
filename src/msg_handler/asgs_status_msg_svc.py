@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-    Entrypoint for the ecflow run properties msg svc queue listener/handler
+    Entrypoint for the ASGS status queue message listener/handler
 
     Authors: Lisa Stillwell, Phil Owen @RENCI.org
 """
@@ -16,7 +16,7 @@ from src.common.asgs_queue_callback import AsgsQueueCallback
 
 def run():
     """
-    Fires up the ecflow run properties message listener/handler
+    Fires up the ASGS status queue message listener/handler
 
     :return:
     """
@@ -24,20 +24,19 @@ def run():
     log_level, log_path = LoggingUtil.prep_for_logging()
 
     # create a logger
-    logger = LoggingUtil.init_logging("APSVIZ.APSViz-Msg-Handler.ecflow_run_props_msg_svc", level=log_level, line_format='medium',
-                                      log_file_path=log_path)
+    logger = LoggingUtil.init_logging("APSVIZ.APSViz-Msg-Handler.asgs_status_msg_svc", level=log_level, line_format='medium', log_file_path=log_path)
 
-    logger.info("Initializing ecflow_run_props_msg_svc handler.")
+    logger.info("Initializing asgs_status_msg_svc handler.")
 
     try:
         # get an instance to the callback handler
         queue_callback_inst = AsgsQueueCallback(_logger=logger)
 
         # start consuming the messages
-        queue_callback_inst.start_consuming('rp_queue', queue_callback_inst.asgs_run_props_callback)
+        queue_callback_inst.start_consuming('asgs_queue', queue_callback_inst.asgs_run_props_callback)
 
     except Exception:
-        logger.exception("FAILURE - Problems initiating ecflow_run_props_msg_svc.")
+        logger.exception("FAILURE - Problems initializing asgs_status_msg_svc.")
 
 
 if __name__ == "__main__":
