@@ -9,7 +9,9 @@
 
     Authors: Lisa Stillwell, Phil Owen @RENCI.org
 """
+import os
 import json
+import pika
 
 from src.common.logger import LoggingUtil
 from src.common.general_utils import GeneralUtils
@@ -53,9 +55,9 @@ class AsgsQueueCallback:
 
         self.logger.info("ASGS_Queue_callback initialization complete")
 
-    def callback(self, channel, method, properties, body):
+    def asgs_msg_callback(self, channel, method, properties, body):
         """
-        main worker that operates on the incoming message from the queue
+        main worker that operates on the incoming ASGS messages from the queue
 
         :param channel:
         :param method:
@@ -132,9 +134,9 @@ class AsgsQueueCallback:
         else:
             self.logger.error("FAILURE - Cannot retrieve advisory number, site, event type or state type ids.")
 
-    def cfg_callback(self, channel, method, properties, body):
+    def asgs_run_props_callback(self, channel, method, properties, body):
         """
-        The callback function for things that land on the configuration queue
+        The callback function for the run properties queue
 
         :param channel:
         :param method:
@@ -146,8 +148,8 @@ class AsgsQueueCallback:
         # init the return message
         ret_msg = None
 
-        self.logger.info("Received cfg msg: channel: %s, method: %s, properties: %s, body: %s", channel, method, properties, body)
-        context = "Config Message Queue callback function"
+        self.logger.info("Received run props msg: channel: %s, method: %s, properties: %s, body: %s", channel, method, properties, body)
+        context = "Run properties message queue callback function"
 
         # load the message
         try:
@@ -218,9 +220,68 @@ class AsgsQueueCallback:
             # send a message to slack
             self.general_utils.send_slack_msg(context, 'slack_issues_channel', "ERROR loading the config message.")
 
+    def ecflow_run_props_callback(self, channel, method, properties, body):
+        """
+        The callback function for the ecflow run properties queue
+
+        :param channel:
+        :param method:
+        :param properties:
+        :param body:
+        :return:
+        """
+
+        self.logger.info("Received ECFlow run props msg: channel: %s, method: %s, properties: %s, body: %s", channel, method, properties, body)
+
+    def start_consuming(self, queue_name, callback):
+        """
+        Creates and starts consuming queue messages
+
+        :param queue_name:
+        :param callback:
+        :return:
+        """
+        # prep a new queue message handler
+        channel = self.create_msg_listener('asgs_props')
+
+        # specify the queue callback handler
+        channel.basic_consume('asgs_props', callback, auto_ack=True)
+
+        self.logger.info('Listener configured and waiting for messages from %s',  {queue_name})
+
+        # start the queue listener/handler
+        channel.start_consuming()
+
+    def create_msg_listener(self, queue_name):
+        """
+        Creates a new queue message listener
+
+        :param queue_name:
+        :return:
+        """
+        # set up AMQP credentials and connect to asgs queue
+        credentials = pika.PlainCredentials(os.environ.get("RABBITMQ_USER"), os.environ.get("RABBITMQ_PW"))
+
+        # set up the connection parameters
+        connect_params = pika.ConnectionParameters(os.environ.get("RABBITMQ_HOST"), 5672, '/', credentials, socket_timeout=2)
+
+        # get a connection to the queue
+        connection = pika.BlockingConnection(connect_params)
+
+        # create a new queue channel
+        channel = connection.channel()
+
+        # specify the queue that will be listened to
+        channel.queue_declare(queue=queue_name)
+
+        self.logger.info('Channel configured and waiting for messages from %s', queue_name)
+
+        # return the queue channel
+        return channel
+
     def get_site_ids(self) -> list:
         """
-        gets the list of site ids for the donfiguration message handler
+        gets the list of site ids for the ASGS run properties message handler
 
         :return:
         """
