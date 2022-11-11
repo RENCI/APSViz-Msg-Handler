@@ -34,7 +34,7 @@ def run():
         queue_callback_inst = AsgsQueueCallback(_logger=logger)
 
         # start consuming the messages
-        queue_callback_inst.start_consuming('rp_queue', queue_callback_inst.asgs_run_props_callback)
+        queue_callback_inst.start_consuming('rp_queue', queue_callback_inst.ecflow_run_props_callback)
 
     except Exception:
         logger.exception("FAILURE - Problems initiating ecflow_run_props_msg_svc.")
