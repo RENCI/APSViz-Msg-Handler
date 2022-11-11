@@ -42,7 +42,7 @@ class AsgsQueueCallback:
             # create a logger
             self.logger = LoggingUtil.init_logging("APSVIZ.Archiver.ASGSQueueCallback", level=log_level, line_format='medium', log_file_path=log_path)
 
-        self.logger.info("Initializing ASGS_Queue_callback")
+        self.logger.info("Initializing ASGS_Queue_callback.")
 
         # define and init the object used to handle ASGS constant conversions
         self.asgs_constants_inst = AsgsConstants(_logger=self.logger)
@@ -53,7 +53,7 @@ class AsgsQueueCallback:
         # create the general utilities class
         self.general_utils = GeneralUtils(_logger)
 
-        self.logger.info("ASGS_Queue_callback initialization complete")
+        self.logger.info("ASGS_Queue_callback initialization complete.")
 
     def asgs_msg_callback(self, channel, method, properties, body):
         """
@@ -208,9 +208,9 @@ class AsgsQueueCallback:
                         self.logger.error("FAILURE - Cannot find instance. Ignoring message.")
 
                         # send a message to slack
-                        self.general_utils.send_slack_msg(context, 'slack_issues_channel',
-                                                          f'Instance provided in message: '
-                                                          f'{msg_obj.get("instance_name", "N/A")} does not exist. Ignoring message.')
+                        self.general_utils.send_slack_msg(context, 'slack_issues_channel', f'Instance provided in message: '
+                                                                                           f'{msg_obj.get("instance_name", "N/A")} '
+                                                                                           f'does not exist. Ignoring message.')
                 else:
                     self.logger.error('FAILURE - Site %s not supported. Ignoring message.', {site_id[1]})
 
@@ -242,20 +242,24 @@ class AsgsQueueCallback:
         :return:
         """
         try:
-            # prep a new queue message handler
-            channel = self.create_msg_listener('asgs_props')
+            # create a new queue message handler
+            channel: pika.adapters.blocking_connection.BlockingChannel = self.create_msg_listener(queue_name)
 
-            # specify the queue callback handler
-            channel.basic_consume('asgs_props', callback, auto_ack=True)
+            # check to see if we got a channel to the queue
+            if not channel:
+                self.logger.error("Error: Did not get a channel to queue %s.", queue_name)
+            else:
+                # specify the queue callback handler
+                channel.basic_consume(queue_name, callback, auto_ack=True)
 
-            self.logger.info('Listener configured and waiting for messages from %s',  {queue_name})
+                self.logger.info('Listener configured and waiting for messages from %s.', queue_name)
 
-            # start the queue listener/handler
-            channel.start_consuming()
+                # start the queue listener/handler
+                channel.start_consuming()
         except Exception:
-            self.logger.exception("Error: Exception on the start of consuming.")
+            self.logger.exception("Error: Exception consuming queue %s.", queue_name)
 
-    def create_msg_listener(self, queue_name):
+    def create_msg_listener(self, queue_name: str) -> pika.adapters.blocking_connection.BlockingChannel:
         """
         Creates a new queue message listener
 
@@ -263,27 +267,28 @@ class AsgsQueueCallback:
         :return:
         """
         # init the return
-        channel = None
+        channel: pika.adapters.blocking_connection.BlockingChannel = None
 
         try:
             # set up AMQP credentials and connect to asgs queue
-            credentials = pika.PlainCredentials(os.environ.get("RABBITMQ_USER"), os.environ.get("RABBITMQ_PW"))
+            credentials: pika.PlainCredentials = pika.PlainCredentials(os.environ.get("RABBITMQ_USER"), os.environ.get("RABBITMQ_PW"))
 
             # set up the connection parameters
-            connect_params = pika.ConnectionParameters(os.environ.get("RABBITMQ_HOST"), 5672, '/', credentials, socket_timeout=2)
+            connect_params: pika.ConnectionParameters = pika.ConnectionParameters(os.environ.get("RABBITMQ_HOST"), 5672, '/', credentials,
+                                                                                  socket_timeout=2)
 
             # get a connection to the queue
-            connection = pika.BlockingConnection(connect_params)
+            connection: pika.BlockingConnection = pika.BlockingConnection(connect_params)
 
             # create a new queue channel
-            channel = connection.channel()
+            channel: pika.adapters.blocking_connection.BlockingChannel = connection.channel()
 
             # specify the queue that will be listened to
             channel.queue_declare(queue=queue_name)
 
-            self.logger.info('Channel configured queue %s on %s:5672', queue_name, os.environ.get("RABBITMQ_HOST"))
+            self.logger.info('Channel configured to queue %s on %s:5672.', queue_name, os.environ.get("RABBITMQ_HOST"))
         except Exception:
-            self.logger.exception("Error: Exception on the creation of channel.")
+            self.logger.exception("Error: Exception on the creation of channel to %s.", queue_name)
 
         # return the queue channel
         return channel
