@@ -241,16 +241,19 @@ class AsgsQueueCallback:
         :param callback:
         :return:
         """
-        # prep a new queue message handler
-        channel = self.create_msg_listener('asgs_props')
+        try:
+            # prep a new queue message handler
+            channel = self.create_msg_listener('asgs_props')
 
-        # specify the queue callback handler
-        channel.basic_consume('asgs_props', callback, auto_ack=True)
+            # specify the queue callback handler
+            channel.basic_consume('asgs_props', callback, auto_ack=True)
 
-        self.logger.info('Listener configured and waiting for messages from %s',  {queue_name})
+            self.logger.info('Listener configured and waiting for messages from %s',  {queue_name})
 
-        # start the queue listener/handler
-        channel.start_consuming()
+            # start the queue listener/handler
+            channel.start_consuming()
+        except Exception:
+            self.logger.exception("Error: Exception on the start of consuming.")
 
     def create_msg_listener(self, queue_name):
         """
@@ -259,22 +262,28 @@ class AsgsQueueCallback:
         :param queue_name:
         :return:
         """
-        # set up AMQP credentials and connect to asgs queue
-        credentials = pika.PlainCredentials(os.environ.get("RABBITMQ_USER"), os.environ.get("RABBITMQ_PW"))
+        # init the return
+        channel = None
 
-        # set up the connection parameters
-        connect_params = pika.ConnectionParameters(os.environ.get("RABBITMQ_HOST"), 5672, '/', credentials, socket_timeout=2)
+        try:
+            # set up AMQP credentials and connect to asgs queue
+            credentials = pika.PlainCredentials(os.environ.get("RABBITMQ_USER"), os.environ.get("RABBITMQ_PW"))
 
-        # get a connection to the queue
-        connection = pika.BlockingConnection(connect_params)
+            # set up the connection parameters
+            connect_params = pika.ConnectionParameters(os.environ.get("RABBITMQ_HOST"), 5672, '/', credentials, socket_timeout=2)
 
-        # create a new queue channel
-        channel = connection.channel()
+            # get a connection to the queue
+            connection = pika.BlockingConnection(connect_params)
 
-        # specify the queue that will be listened to
-        channel.queue_declare(queue=queue_name)
+            # create a new queue channel
+            channel = connection.channel()
 
-        self.logger.info('Channel configured and waiting for messages from %s', queue_name)
+            # specify the queue that will be listened to
+            channel.queue_declare(queue=queue_name)
+
+            self.logger.info('Channel configured queue %s on %s:5672', queue_name, os.environ.get("RABBITMQ_HOST"))
+        except Exception:
+            self.logger.exception("Error: Exception on the creation of channel.")
 
         # return the queue channel
         return channel
