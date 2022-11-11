@@ -33,7 +33,7 @@ def run():
         queue_callback_inst = AsgsQueueCallback(_logger=logger)
 
         # start consuming the messages
-        queue_callback_inst.start_consuming('asgs_queue', queue_callback_inst.asgs_run_props_callback)
+        queue_callback_inst.start_consuming('asgs_queue', queue_callback_inst.asgs_msg_callback)
 
     except Exception:
         logger.exception("FAILURE - Problems initializing asgs_status_msg_svc.")
