@@ -42,10 +42,10 @@ class AsgsQueueCallback:
             # create a logger
             self.logger = LoggingUtil.init_logging("APSVIZ.Archiver.ASGSQueueCallback", level=log_level, line_format='medium', log_file_path=log_path)
 
-        self.logger.info("Initializing ASGSQueueCallback.")
-
         # save the queue name
         self.queue_name = _queue_name
+
+        self.logger.info("Initializing ASGSQueueCallback for queue %s", _queue_name)
 
         # define and init the object used to handle ASGS constant conversions
         self.asgs_constants_inst = AsgsConstants(_logger=self.logger)
@@ -56,7 +56,7 @@ class AsgsQueueCallback:
         # create the general utilities class
         self.general_utils = GeneralUtils(_logger)
 
-        self.logger.info("ASGSQueueCallback initialization complete.")
+        self.logger.info("ASGSQueueCallback initialization for queue %s complete.", _queue_name)
 
     def asgs_msg_callback(self, channel, method, properties, body):
         """
@@ -68,7 +68,7 @@ class AsgsQueueCallback:
         :param body:
         :return:
         """
-        self.logger.info("Received ASGS status msg. channel: %s, method: %s, properties: %s, body: %s bytes.", channel, method, properties, len(body))
+        self.logger.info("Received ASGS status msg. Body is %s bytes.", len(body))
 
         # load the message
         msg_obj = json.loads(body)
@@ -151,8 +151,7 @@ class AsgsQueueCallback:
         # init the return message
         ret_msg = None
 
-        self.logger.info("Received ASGS run props msg. channel: %s, method: %s, properties: %s, body: %s bytes", channel, method, properties,
-                         len(body))
+        self.logger.info("Received ASGS run props msg. Body is %s bytes.", len(body))
         context = "Run properties message queue callback function"
 
         # load the message
@@ -235,7 +234,7 @@ class AsgsQueueCallback:
         :return:
         """
 
-        self.logger.info("Received ECFlow run props msg. channel: %s, method: %s, properties: %s, body: %s", channel, method, properties, body)
+        self.logger.info("Received ECFlow run props msg. Body is %s bytes.", len(body))
 
     def start_consuming(self, callback):
         """
