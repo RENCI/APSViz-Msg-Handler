@@ -68,7 +68,8 @@ class AsgsQueueCallback:
         :param body:
         :return:
         """
-        self.logger.info("Received ASGS status msg. Body is %s bytes.", len(body))
+        self.logger.info("Received ASGS status msg. channel: %s, method: %s, properties: %s, body is %s bytes", channel, method, properties,
+                         len(body))
 
         # load the message
         msg_obj = json.loads(body)
@@ -151,7 +152,8 @@ class AsgsQueueCallback:
         # init the return message
         ret_msg = None
 
-        self.logger.info("Received ASGS run props msg. Body is %s bytes.", len(body))
+        self.logger.info("Received ASGS run props msg. channel: %s, method: %s, properties: %s, body is %s bytes", channel, method, properties,
+                         len(body))
         context = "Run properties message queue callback function"
 
         # load the message
@@ -234,7 +236,8 @@ class AsgsQueueCallback:
         :return:
         """
 
-        self.logger.info("Received ECFlow run props msg. Body is %s bytes.", len(body))
+        self.logger.info("Received ECFlow run props msg. channel: %s, method: %s, properties: %s, body is %s bytes", channel, method, properties,
+                         len(body))
 
     def start_consuming(self, callback):
         """
@@ -261,7 +264,7 @@ class AsgsQueueCallback:
         except Exception:
             self.logger.exception("Error: Exception consuming queue %s.", self.queue_name)
 
-    def create_msg_listener(self, queue_name: str) -> pika.adapters.blocking_connection.BlockingChannel:
+    def create_msg_listener(self, queue_name: str):
         """
         Creates a new queue message listener
 
@@ -269,7 +272,7 @@ class AsgsQueueCallback:
         :return:
         """
         # init the return
-        channel: pika.adapters.blocking_connection.BlockingChannel = None
+        channel = None
 
         try:
             # set up AMQP credentials and connect to asgs queue
