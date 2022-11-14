@@ -9,9 +9,6 @@
 
     Authors: Lisa Stillwell, Phil Owen @RENCI.org
 """
-import os
-import pika
-
 from src.common.logger import LoggingUtil
 from src.common.asgs_queue_callback import AsgsQueueCallback
 
@@ -31,33 +28,12 @@ def run():
     logger.info("Initializing asgs_status_msg_svc handler.")
 
     try:
-        # set up AMQP credentials and connect to asgs queue
-        credentials = pika.PlainCredentials(os.environ.get("RABBITMQ_USER"),  os.environ.get("RABBITMQ_PW"))
-
-        # set up the connection parameters
-        connect_params = pika.ConnectionParameters(os.environ.get("RABBITMQ_HOST"), 5672, '/', credentials, socket_timeout=2)
-
-        # get a connection to the queue
-        connection = pika.BlockingConnection(connect_params)
-
-        # create a new queue channel
-        channel = connection.channel()
-
-        # specify the queue that will be listened to
-        channel.queue_declare(queue='asgs_queue')
-
-        logger.info("asgs_status_msg_svc channel and queue declared.")
-
         # get an instance to the callback handler
-        queue_callback_inst = AsgsQueueCallback(_logger=logger)
+        queue_callback_inst = AsgsQueueCallback(_queue_name='asgs_queue', _logger=logger)
 
-        # specify the queue callback handler
-        channel.basic_consume('asgs_queue', queue_callback_inst.asgs_msg_callback, auto_ack=True)
+        # start consuming the messages
+        queue_callback_inst.start_consuming(queue_callback_inst.asgs_msg_callback)
 
-        logger.info('asgs_status_msg_svc configured and waiting for messages...')
-
-        # start the queue listener/handler
-        channel.start_consuming()
     except Exception:
         logger.exception("FAILURE - Problems initializing asgs_status_msg_svc.")
 
