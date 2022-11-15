@@ -68,8 +68,8 @@ class AsgsQueueCallback:
         :param body:
         :return:
         """
-        self.logger.info("Received ASGS status msg. channel: %s, method: %s, properties: %s, body is %s bytes", channel, method, properties,
-                         len(body))
+        self.logger.info("Received ASGS status msg. Body is %s bytes.", len(body))
+        self.logger.debug("Received ASGS status msg. channel: %s, method: %s, properties: %s.", channel, method, properties)
 
         # load the message
         msg_obj = json.loads(body)
@@ -152,8 +152,9 @@ class AsgsQueueCallback:
         # init the return message
         ret_msg = None
 
-        self.logger.info("Received ASGS run props msg. channel: %s, method: %s, properties: %s, body is %s bytes", channel, method, properties,
-                         len(body))
+        self.logger.info("Received ASGS run props msg. Body is %s bytes.", len(body))
+        self.logger.debug("Received ASGS run props msg. channel: %s, method: %s, properties: %s", channel, method, properties)
+
         context = "Run properties message queue callback function"
 
         # load the message
@@ -197,7 +198,7 @@ class AsgsQueueCallback:
                             ret_msg = self.asgs_db_inst.insert_config_items(instance_id, param_list)
 
                             if ret_msg is not None:
-                                err = f'ERROR - DB insert for message failed: {ret_msg}. Ignoring message.'
+                                err = f'ERROR - DB insert for message failed: {ret_msg}, ignoring message.'
                                 self.logger.error(err)
 
                                 # send a message to slack
@@ -235,9 +236,8 @@ class AsgsQueueCallback:
         :param body:
         :return:
         """
-
-        self.logger.info("Received ECFlow run props msg. channel: %s, method: %s, properties: %s, body is %s bytes", channel, method, properties,
-                         len(body))
+        self.logger.info("Received ECFlow run props msg. Body is %s bytes.", len(body))
+        self.logger.debug("Received ECFlow run props msg. channel: %s, method: %s, properties: %s.", channel, method, properties)
 
     def start_consuming(self, callback):
         """
@@ -272,7 +272,8 @@ class AsgsQueueCallback:
         :return:
         """
         # init the return
-        channel = None
+        # noinspection PyTypeChecker
+        channel: pika.adapters.blocking_connection.BlockingChannel = None
 
         try:
             # set up AMQP credentials and connect to asgs queue
