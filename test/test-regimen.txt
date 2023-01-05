@@ -1,0 +1,39 @@
+how to setup for local testing of posting and pulling from a queue.
+
+the ./test/send_test_msg.py file attaches to a queue and posts a message to it. a seperate process (message handler)
+must be running to assign a callback process to process the message when it arrives on a queue.
+
+1.) port-forward to a running instance of RabbitMQ running k9s
+
+2.) prepare the launch of ./test/send_test_msg.py
+    a.) command line: send_test_msgs.py -f <test data file> -q <target queue name> -p <pause>
+        Where:
+            <test data file> is the name of the file that contains test data
+            <target queue name> is the name of the queue on the rabbit MQ server.
+            <pause> between test data posts
+    b.) environment variables. note real values can be found in the k8s deployment values files.
+        LOG_LEVEL=10
+        LOG_PATH=D:\dvols\apsviz\data\logs
+        RABBITMQ_HOST=<main host name>
+        RABBITMQ_PW=<main password>>
+        RABBITMQ_USER=<main user name>
+        SYSTEM=TEST
+
+        the following params configure a message relay host. when defined, a processed message will be relayed to the host/queue specified.
+        RELAY_RABBITMQ_HOST=<relay host name>
+        RELAY_RABBITMQ_PW=<relay password>>
+        RELAY_RABBITMQ_USER=<relay user name>
+
+
+3.) starting up.
+    a.) initiate a message handler for a queue. this will act as the callback called by the host to process the message.
+    b.) execute the tester using the queue handler specified above.
+
+3.) general guidelines
+    a.) send_test_msgs.py uses the RELAY_RABBITMQ_HOST to select the host where the message will be sent.
+    b.) the queue name on the host corresponds to <target queue name> on the send_test_msgs.py command line.
+    c.) if the target queue name doesnt exist in a message handler it will be created automatically.
+    d.) the queue name must already exist on the message handler startup. otherwise the message will not be handled properly.
+    e.) the queue management console can be used to determine if a message was received and handled.
+    f.) log files can be viewed to determine if the message was sent and handled properly.
+    g.) start all message handlers and then run send_test_msgs.py targeting each queue.
