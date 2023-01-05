@@ -11,6 +11,7 @@
 """
 from src.common.logger import LoggingUtil
 from src.common.asgs_queue_callback import AsgsQueueCallback
+from src.common.queue_utils import QueueUtils
 
 
 def run():
@@ -29,10 +30,13 @@ def run():
 
     try:
         # get an instance to the callback handler
-        queue_callback_inst = AsgsQueueCallback(_queue_name='asgs_queue', _logger=logger)
+        queue_callback = AsgsQueueCallback(_queue_name='asgs_queue', _logger=logger)
+
+        # get a reference to the common queue utilities
+        queue_utils = QueueUtils(_queue_name='asgs_queue', _logger=logger)
 
         # start consuming the messages
-        queue_callback_inst.start_consuming(queue_callback_inst.asgs_msg_callback)
+        queue_utils.start_consuming(queue_callback.asgs_msg_callback)
 
     except Exception:
         logger.exception("FAILURE - Problems initializing asgs_status_msg_svc.")

@@ -11,6 +11,7 @@
 """
 from src.common.logger import LoggingUtil
 from src.common.asgs_queue_callback import AsgsQueueCallback
+from src.common.queue_utils import QueueUtils
 
 
 def run():
@@ -29,11 +30,14 @@ def run():
     logger.info("Initializing ecflow_run_props_msg_svc handler.")
 
     try:
-        # get an instance to the callback handler
-        queue_callback_inst = AsgsQueueCallback(_queue_name='rp_queue', _logger=logger)
+        # get a reference to the common callback handler
+        queue_callback = AsgsQueueCallback(_queue_name='rp_queue', _logger=logger)
+
+        # get a reference to the common queue utilities
+        queue_utils = QueueUtils(_queue_name='rp_queue', _logger=logger)
 
         # start consuming the messages
-        queue_callback_inst.start_consuming(queue_callback_inst.ecflow_run_props_callback)
+        queue_utils.start_consuming(queue_callback.ecflow_run_props_callback)
 
     except Exception:
         logger.exception("FAILURE - Problems initiating ecflow_run_props_msg_svc.")
