@@ -92,3 +92,23 @@ class AsgsConstants:
 
         # return to the caller
         return ret_id
+
+    def get_site_ids(self) -> list:
+        """
+        gets the list of site ids for the ASGS run properties message handler
+
+        :return:
+        """
+        # get all the ids
+        renci = self.get_lu_id('RENCI', 'site')
+        tacc = self.get_lu_id('TACC', 'site')
+        lsu = self.get_lu_id('LSU', 'site')
+        penguin = self.get_lu_id('Penguin', 'site')
+        loni = self.get_lu_id('LONI', 'site')
+        seahorse = self.get_lu_id('Seahorse', 'site')
+        qb2 = self.get_lu_id('QB2', 'site')
+        cct = self.get_lu_id('CCT', 'site')
+        psc = self.get_lu_id('PSC', 'site')
+
+        # return the list of ids
+        return [cct, loni, lsu, penguin, psc, qb2, renci, seahorse, tacc]
