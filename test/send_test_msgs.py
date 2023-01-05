@@ -9,34 +9,10 @@
 
     Author: Phil Owen, RENCI.org
 """
-import os
 import sys
 import time
 import argparse
-import pika
-
-
-def queue_message(queue: str, message: str):
-    """
-
-    :param queue:
-    :param message:
-    :return:
-    """
-
-    # set up AMQP credentials and connect to asgs queue
-    credentials = pika.PlainCredentials(os.environ.get("RABBITMQ_USER"), os.environ.get("RABBITMQ_PW"))
-    parameters = pika.ConnectionParameters(os.environ.get("RABBITMQ_HOST"), 5672, '/', credentials, socket_timeout=2)
-
-    connection = pika.BlockingConnection(parameters)
-    channel = connection.channel()
-
-    # channel.queue_declare(queue="asgs_queue")
-    channel.queue_declare(queue=queue)
-
-    # channel.basic_publish(exchange='',routing_key='asgs_queue',body=message)
-    channel.basic_publish(exchange='', routing_key=queue, body=message)
-    connection.close()
+from src.common.queue_utils import QueueUtils
 
 
 if __name__ == '__main__':
@@ -53,15 +29,17 @@ if __name__ == '__main__':
     # parse the command line
     args = parser.parse_args()
 
+    queue_utils = QueueUtils(args.queue)
+
     # open messages file
     with open(args.filename, 'r', encoding='utf-8') as f:
         # submit each line in the file to the queue
         for line in f:
             # the data is in json/text format
-            msg_obj = line
+            msg_obj: str = line
 
             # send the msg to the queue specified
-            queue_message(args.queue, msg_obj)
+            queue_utils.relay_msg(args.queue, msg_obj)
 
             # something for the user
             print(msg_obj)
