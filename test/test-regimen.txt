@@ -6,11 +6,11 @@ must be running to assign a callback to process a message when it has been poste
 1.) port-forward to a running instance of RabbitMQ running k8s
 
 2.) prepare the launch of ./test/send_test_msg.py
-    a. command line: send_test_msgs.py -f <test data file> -q <target queue name> -p <pause>
+    a. command line: send_test_msgs.py -f <test data file> -q <target queue name> -d <delay>
         Where:
             <test data file> is the name of the file that contains test data
             <target queue name> is the name of the queue to send the message on the rabbit MQ server.
-            <pause> delay between posting a list of test data messages to the queue.
+            <delay> pause between posting a list of test data messages to the queue.
 
 3.) environment variables. note real values can be found in the k8s deployment values files.
     a. see environment variable in the k8s deployment scrips.
