@@ -24,7 +24,7 @@ if __name__ == '__main__':
     # assign the expected input args
     parser.add_argument('-f', '--filename', help='Input file name that contains test queue data')
     parser.add_argument('-q', '--queue', help='the name of the queue that will be posted to.')
-    parser.add_argument('-p', '--pause', help='the amount of time to pause (in seconds) between queue submissions.', default=2)
+    parser.add_argument('-d', '--delay', help='the amount of time to pause (in seconds) between queue submissions.', default=2)
 
     # parse the command line
     args = parser.parse_args()
@@ -45,7 +45,7 @@ if __name__ == '__main__':
             print(msg_obj)
 
             # pause between each queue submission
-            time.sleep(int(args.pause))
+            time.sleep(int(args.delay))
 
     # exit with pass/fail
     sys.exit(0)
