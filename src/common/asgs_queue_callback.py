@@ -244,3 +244,21 @@ class AsgsQueueCallback:
         if os.environ.get("RELAY_RABBITMQ_HOST"):
             # send the message along to another queue
             self.queue_utils.relay_msg('relay_queue', body)
+
+    def hec_ras_callback(self, channel, method, properties, body):
+        """
+        The callback function for the HEC/RAS queue
+
+        :param channel:
+        :param method:
+        :param properties:
+        :param body:
+        :return:
+        """
+        self.logger.info("Received HEC/RAS msg. Body is %s bytes.", len(body))
+        self.logger.debug("Received HEC/RAS msg. channel: %s, method: %s, properties: %s.", channel, method, properties)
+
+        # if there is a relay host set send the message over there
+        if os.environ.get("RELAY_RABBITMQ_HOST"):
+            # send the message along to another queue
+            self.queue_utils.relay_msg('relay_queue', body)
