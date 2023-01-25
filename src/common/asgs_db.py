@@ -182,7 +182,7 @@ class AsgsDb:
 
             return ret_val
         except Exception:
-            self.logger.exception("FAILURE - DB issue")
+            self.logger.exception("FAILURE - DB issue. Incoming SQL %s:", sql_stmt)
             return -1
 
     def get_existing_event_group_id(self, instance_id, advisory_id):
