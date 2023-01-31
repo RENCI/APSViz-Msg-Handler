@@ -37,7 +37,7 @@ def run():
         queue_utils = QueueUtils(_queue_name='hec_ras_queue', _logger=logger)
 
         # start consuming the messages
-        queue_utils.start_consuming(queue_callback.hec_ras_run_props_callback)
+        queue_utils.start_consuming(queue_callback.hec_ras_callback)
 
     except Exception:
         logger.exception("FAILURE - Problems initiating hec_ras_msg_svc.")
