@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-    Entrypoint for the ecflow_rt run properties msg svc queue listener/handler
+    Entrypoint for the ecflow_rt run time msg svc queue listener/handler
 
     Authors: Lisa Stillwell, Phil Owen @RENCI.org
 """
@@ -16,7 +16,7 @@ from src.common.queue_utils import QueueUtils
 
 def run():
     """
-    Fires up the ecflow_r run properties message listener/handler
+    Fires up the ecflow_rt run time message listener/handler
 
     :return:
     """
@@ -24,7 +24,7 @@ def run():
     log_level, log_path = LoggingUtil.prep_for_logging()
 
     # create a logger
-    logger = LoggingUtil.init_logging("APSVIZ.APSViz-Msg-Handler.ecflow_rt_run_props_msg_svc", level=log_level, line_format='medium',
+    logger = LoggingUtil.init_logging("APSVIZ.APSViz-Msg-Handler.ecflow_run_time_msg_svc", level=log_level, line_format='medium',
                                       log_file_path=log_path)
 
     logger.info("Initializing ecflow_rt_run_props_msg_svc handler.")
@@ -40,7 +40,7 @@ def run():
         queue_utils.start_consuming(queue_callback.ecflow_rt_run_props_callback)
 
     except Exception:
-        logger.exception("FAILURE - Problems initiating ecflow_rt_run_props_msg_svc.")
+        logger.exception("FAILURE - Problems initiating ecflow_run_time_msg_svc.")
 
 
 if __name__ == "__main__":
