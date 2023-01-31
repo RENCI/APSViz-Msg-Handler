@@ -247,9 +247,9 @@ class AsgsQueueCallback:
             # send a message to slack
             self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
 
-    def ecflow_run_props_callback(self, channel, method, properties, body):
+    def ecflow_rp_run_props_callback(self, channel, method, properties, body):
         """
-        The callback function for the ecflow run properties queue
+        The callback function for the ecflow_rp run properties queue
 
         :param channel:
         :param method:
@@ -257,8 +257,26 @@ class AsgsQueueCallback:
         :param body:
         :return:
         """
-        self.logger.info("Received ECFlow run props msg. Body is %s bytes.", len(body))
-        self.logger.debug("Received ECFlow run props msg. channel: %s, method: %s, properties: %s.", channel, method, properties)
+        self.logger.info("Received ECFlow_rp run props msg. Body is %s bytes.", len(body))
+        self.logger.debug("Received ECFlow_rp run props msg. channel: %s, method: %s, properties: %s.", channel, method, properties)
+
+        # if there is a relay host set send the message over there
+        if os.environ.get("RELAY_RABBITMQ_HOST"):
+            # send the message along to another queue
+            self.queue_utils.relay_msg('relay_queue', body)
+
+    def ecflow_rt_run_props_callback(self, channel, method, properties, body):
+        """
+        The callback function for the ecflow_rt run properties queue
+
+        :param channel:
+        :param method:
+        :param properties:
+        :param body:
+        :return:
+        """
+        self.logger.info("Received ECFlow_rt run props msg. Body is %s bytes.", len(body))
+        self.logger.debug("Received ECFlow_rt run props msg. channel: %s, method: %s, properties: %s.", channel, method, properties)
 
         # if there is a relay host set send the message over there
         if os.environ.get("RELAY_RABBITMQ_HOST"):
