@@ -39,7 +39,7 @@ class AsgsDb:
             log_level, log_path = LoggingUtil.prep_for_logging()
 
             # create a logger
-            self.logger = LoggingUtil.init_logging("APSVIZ.APSViz-Msg-Handler.ASGSDB", level=log_level, line_format='medium', log_file_path=log_path)
+            self.logger = LoggingUtil.init_logging("APSVIZ.Msg-Handler.ASGSDB", level=log_level, line_format='medium', log_file_path=log_path)
 
         # get configuration params from the pods secrets
         username = os.environ.get('ASGS_DB_USERNAME')
