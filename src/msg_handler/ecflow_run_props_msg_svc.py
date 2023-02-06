@@ -10,7 +10,7 @@
     Authors: Lisa Stillwell, Phil Owen @RENCI.org
 """
 from src.common.logger import LoggingUtil
-from src.common.asgs_queue_callback import AsgsQueueCallback
+from src.common.queue_callbacks import QueueCallbacks
 from src.common.queue_utils import QueueUtils
 
 
@@ -24,20 +24,20 @@ def run():
     log_level, log_path = LoggingUtil.prep_for_logging()
 
     # create a logger
-    logger = LoggingUtil.init_logging("APSVIZ.APSViz-Msg-Handler.ecflow_run_props_msg_svc", level=log_level, line_format='medium',
+    logger = LoggingUtil.init_logging("APSVIZ.Msg-Handler.ecflow_run_props_msg_svc", level=log_level, line_format='medium',
                                       log_file_path=log_path)
 
     logger.info("Initializing ecflow_run_props_msg_svc handler.")
 
     try:
         # get a reference to the common callback handler
-        queue_callback = AsgsQueueCallback(_queue_name='ecflow_rp', _logger=logger)
+        queue_callback = QueueCallbacks(_queue_name='ecflow_rp', _logger=logger)
 
         # get a reference to the common queue utilities
         queue_utils = QueueUtils(_queue_name='ecflow_rp', _logger=logger)
 
         # start consuming the messages
-        queue_utils.start_consuming(queue_callback.ecflow_rp_run_props_callback)
+        queue_utils.start_consuming(queue_callback.ecflow_run_props_callback)
 
     except Exception:
         logger.exception("FAILURE - Problems initiating ecflow_run_props_msg_svc.")

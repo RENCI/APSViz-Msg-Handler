@@ -10,7 +10,7 @@
     Authors: Lisa Stillwell, Phil Owen @RENCI.org
 """
 from src.common.logger import LoggingUtil
-from src.common.asgs_queue_callback import AsgsQueueCallback
+from src.common.queue_callbacks import QueueCallbacks
 from src.common.queue_utils import QueueUtils
 
 def run():
@@ -23,14 +23,14 @@ def run():
     log_level, log_path = LoggingUtil.prep_for_logging()
 
     # create a logger
-    logger = LoggingUtil.init_logging("APSVIZ.APSViz-Msg-Handler.asgs_run_props_msg_svc", level=log_level, line_format='medium',
+    logger = LoggingUtil.init_logging("APSVIZMsg-Handler.asgs_run_props_msg_svc", level=log_level, line_format='medium',
                                       log_file_path=log_path)
 
     logger.info("Initializing asgs_run_props_msg_svc handler.")
 
     try:
         # get an instance to the callback handler
-        queue_callback = AsgsQueueCallback(_queue_name='asgs_props', _logger=logger)
+        queue_callback = QueueCallbacks(_queue_name='asgs_props', _logger=logger)
 
         # get a reference to the common queue utilities
         queue_utils = QueueUtils(_queue_name='asgs_props', _logger=logger)
