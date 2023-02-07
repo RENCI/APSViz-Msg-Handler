@@ -44,7 +44,7 @@ class QueueUtils:
             # declare the ECFlow target params to asgs keys dict
             self.ecflow_transform_params = {'suite.physical_location': ['physical_location', 'monitoring.rmqmessaging.locationname'],
                                             'suite.instance_name': ['instance_name', 'instancename'], 'suite.project_code': [], 'suite.uid': ['uid'],
-                                            'suite.adcirc.grid': ['ADCIRCgrid', 'adcirc.gridname'], 'time.currentdate': ['currentdate'],
+                                            'suite.adcirc.gridname': ['ADCIRCgrid', 'adcirc.gridname'], 'time.currentdate': ['currentdate'],
                                             'time.currentcycle': ['currentcycle'], 'forcing.advisory': ['advisory'],
                                             'forcing.ensemblename': ['asgs.enstorm', 'enstorm'], 'forcing.metclass': [],
                                             'forcing.stormname': ['stormname', 'forcing.tropicalcyclone.stormname'],
