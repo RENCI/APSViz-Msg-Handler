@@ -177,7 +177,7 @@ class QueueUtils:
             # find this in the run params
             if key in run_params:
                 # grab the new keys from the transform asgs keys list
-                for new_key in self.ecflow_transform_params[key]:
+                for new_key in values:
                     # add the transform key with the run props data value to the dict
                     ret_val.update({new_key: run_params[key]})
 
