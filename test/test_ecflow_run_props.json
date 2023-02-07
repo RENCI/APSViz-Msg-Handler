@@ -1,15 +1,15 @@
 {
-  "suite.uid": "24306857",
-  "suite.instance_name": "ncsc_coamps_09L",
-  "suite.physical_location": "bridges2.psc.edu",
-  "suite.project": "ncfs",
-  "suite.adcirc.grid": "ncsc_sab_v1.23",
-  "time.currentdate": "20220928",
+  "suite.physical_location": "ht-ncfs.renci.org",
+  "suite.project_code": "ecflow_test_renci",
+  "suite.instance_name": "ec95d",
+  "suite.uid": "90161888",
+  "suite.adcirc.gridname": "ec95d",
+  "forcing.ensemblename": "gfsforecast",
+  "time.currentdate": "20230206",
   "time.currentcycle": "12",
   "forcing.advisory": "NA",
-  "forcing.ensemblename": "coampsforecast",
-  "forcing.metclass": "hybrid",
-  "forcing.stormname": "09L",
-  "forcing.stormnumber": "09",
-  "output.downloadurl": "thredds_data/2022/coamps_09L/2022092812/ncsc_sab_v1.23/bridges2.psc.edu/ncsc_coamps_09L"
+  "forcing.metclass": "synoptic",
+  "forcing.waves": "0",
+  "forcing.stormname": "none",
+  "output.downloadurl": "https://apsviz-thredds-dev.apps.renci.org/thredds/fileServer/2023/gfs/2023020612/ec95d/ht-ncfs.renci.org/ec95d/gfsforecast"
 }
