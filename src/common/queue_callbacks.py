@@ -213,7 +213,7 @@ class QueueCallbacks:
 
                         if param_list is not None:
                             # insert the records
-                            ret_msg = self.asgs_db.insert_asgs_config_items(instance_id, param_list, 'ASGS')
+                            ret_msg = self.asgs_db.insert_asgs_config_items(instance_id, param_list)
 
                             if ret_msg is not None:
                                 err_msg = f'{context}: Error - DB insert for run properties message failed: {ret_msg}, ignoring message.'
