@@ -522,6 +522,7 @@ class AsgsDb:
 
         :param instance_id:
         :param param_list:
+        :param workflow_type:
         :return:
         """
 
