@@ -493,7 +493,12 @@ class AsgsDb:
 
             # add a run property to inform the supervisor of the workflow type
             sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
-                       f", 'workflow_type', 'ASGS')"
+                       f", 'workflow_type', 'ECFLOW')"
+
+            self.logger.debug("sql_stmt: %s", sql_stmt)
+
+            # execute the sql
+            self.exec_sql(sql_stmt)
 
             # add a run property to inform the supervisor process this run
             sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
@@ -574,6 +579,11 @@ class AsgsDb:
             # add a run property to inform the supervisor of the workflow type
             sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
                        f", 'workflow_type', 'ASGS')"
+
+            self.logger.debug("sql_stmt: %s", sql_stmt)
+
+            # execute the sql
+            self.exec_sql(sql_stmt)
 
             # add a run property to inform the supervisor process this run
             sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
