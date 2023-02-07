@@ -23,7 +23,7 @@ def run():
     log_level, log_path = LoggingUtil.prep_for_logging()
 
     # create a logger
-    logger = LoggingUtil.init_logging("APSVIZMsg-Handler.asgs_run_props_msg_svc", level=log_level, line_format='medium',
+    logger = LoggingUtil.init_logging("APSVIZ.Msg-Handler.asgs_run_props_msg_svc", level=log_level, line_format='medium',
                                       log_file_path=log_path)
 
     logger.info("Initializing asgs_run_props_msg_svc handler.")
