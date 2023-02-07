@@ -63,4 +63,4 @@ def test_insert_ecflow_config_items():
     ret_val = asgs_db.insert_ecflow_config_items(instance_id, run_props, 'debug')
 
     # test the result, empty str == success
-    assert ret_val == ''
+    assert ret_val is None
