@@ -61,14 +61,10 @@ class AsgsDb:
         self.asgs_constants_inst = asgs_constants_inst
 
     def __del__(self):
-        self.logger.info("ASGS_DB closing the DB connection")
-
         # close up the DB
         try:
             self.cursor.close()
             self.conn.close()
-
-            self.logger.info("ASGS_DB shutdown complete")
         except Exception:
             self.logger.exception("FAILURE - Error closing DB connection.")
 
@@ -445,11 +441,88 @@ class AsgsDb:
 
         return inst
 
-    def insert_config_items(self, instance_id, param_list):
+    def insert_ecflow_config_items(self, instance_id: str, params: dict, supervisor_job_status: str = 'new'):
         """
-        Inserts the configuration parameters into the database
+        Inserts the ECFLOW configuration parameters into the database
+
+        :param instance_id:
+        :param params:
+        :param supervisor_job_status:
+        :return:
         """
+
+        # init the return value
         ret_msg = None
+
+        self.logger.debug("param_list: %s", params)
+
+        # get advisory and enstorm values from param_list to create UID
+        try:
+            # get the advisory param
+            advisory = params['advisory']
+
+            # get the enstorm value
+            enstorm = params['enstorm']
+
+            if advisory and enstorm:
+                # build up the unique ID
+                uid = str(advisory) + "-" + str(enstorm)
+            else:
+                ret_msg = "'advisory' and or 'enstorm' not found in param_list"
+                self.logger.error(ret_msg)
+
+            self.logger.debug("uid: %s", uid)
+
+            sql_stmt = f"DELETE FROM public.\"ASGS_Mon_config_item\" WHERE instance_id = {instance_id} AND uid = '{uid}'"
+
+            # remove all duplicate records that may already exist
+            self.exec_sql(sql_stmt)
+
+            self.logger.debug("sql_stmt: %s", sql_stmt)
+
+            # get the list of values
+            values_list = [f"({instance_id}, '{uid}', '{k}', '{v}')" for (k, v) in params.items()]
+
+            # create a massive insert statement
+            sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES {','.join(values_list)}"
+
+            self.logger.debug("sql_stmt: %s", sql_stmt)
+
+            # execute the sql
+            self.exec_sql(sql_stmt)
+
+            # add a run property to inform the supervisor of the workflow type
+            sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
+                       f", 'workflow_type', 'ASGS')"
+
+            # add a run property to inform the supervisor process this run
+            sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
+                       f", 'supervisor_job_status', '{supervisor_job_status}')"
+
+            self.logger.debug("sql_stmt: %s", sql_stmt)
+
+            # execute the sql
+            self.exec_sql(sql_stmt)
+
+        except Exception:
+            ret_msg = "Exception inserting config items"
+            self.logger.exception(ret_msg)
+            return ret_msg
+
+        return ret_msg
+
+    def insert_asgs_config_items(self, instance_id, param_list):
+        """
+        Inserts the ASGS configuration parameters into the database
+
+        :param instance_id:
+        :param param_list:
+        :return:
+        """
+
+        # init the return value
+        ret_msg = None
+
         self.logger.debug("param_list: %s", param_list)
 
         # get advisory and enstorm values from param_list to create UID
