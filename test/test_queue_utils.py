@@ -43,7 +43,7 @@ def test_ecflow_transformer():
              'ec95d/gfsforecast'})
 
         # check the result
-        assert (ret_val == run_props)
+        assert ret_val == run_props
 
 
 def test_insert_ecflow_config_items():
@@ -77,7 +77,7 @@ def test_insert_ecflow_config_items():
                       'ec95d/gfsforecast'})
 
     # check the result
-    assert (ret_val == run_props)
+    assert ret_val == run_props
 
     # get the state type id. lets just set this to running for this test run
     state_id = asgs_constants.get_lu_id('RUNN', "state_type")
@@ -92,4 +92,4 @@ def test_insert_ecflow_config_items():
     ret_val = asgs_db.insert_ecflow_config_items(instance_id, run_props, 'debug')
 
     # test the result, empty str == success
-    assert (ret_val, '')
+    assert ret_val == ''
