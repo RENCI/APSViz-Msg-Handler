@@ -89,7 +89,7 @@ class QueueCallbacks:
             state_id, state_name = self.asgs_constants.get_lu_id_from_msg(msg_obj, "state", "state_type")
 
             # get the event advisory data
-            advisory_id = msg_obj.get("advisory", "N/A") if (msg_obj.get("advisory", "N/A") != "") else "N/A"
+            advisory_id = msg_obj.get("advisory_number", "N/A") if (msg_obj.get("advisory_number", "N/A") != "") else "N/A"
 
             # did we get everything needed
             if site_id[0] >= 0 and event_type_id >= 0 and state_id >= 0 and advisory_id != 'N/A':
