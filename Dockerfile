@@ -29,7 +29,6 @@ RUN pip install -r requirements.txt
 
 # get all queue message handler files into this image
 COPY src src
-COPY test test
 COPY ./startup.sh ./startup.sh
 
 # make sure the file has execute permissions
