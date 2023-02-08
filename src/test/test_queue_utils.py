@@ -34,11 +34,11 @@ def test_ecflow_transformer():
         # add in the expected transformations
         run_props.update(
             {'physical_location': 'ht-ncfs.renci.org', 'monitoring.rmqmessaging.locationname': 'ht-ncfs.renci.org', 'instance_name': 'ec95d',
-             'instancename': 'ec95d', 'uid': '90161888', 'ADCIRCgrid': 'ec95d', 'adcirc.gridname': 'ec95d', 'currentdate': '20230206',
+             'instancename': 'ec95d', 'uid': '90161888', 'ADCIRCgrid': 'ec95d', 'adcirc.gridname': 'ec95d', 'currentdate': '230206',
              'currentcycle': '12', 'advisory': 'NA', 'asgs.enstorm': 'gfsforecast', 'enstorm': 'gfsforecast', 'stormname': 'none',
              'forcing.tropicalcyclone.stormname': 'none', 'config.coupling.waves': '0',
-             'downloadurl': 'https://apsviz-thredds-dev.apps.renci.org/thredds/fileServer/2023/gfs/2023020612/ec95d/ht-ncfs.renci.org/'
-             'ec95d/gfsforecast'})
+             'downloadurl': 'https://apsviz-thredds-dev.apps.renci.org/thredds/fileServer/2023/gfs/2023020612/ec95d/ht-ncfs.renci.org/ec95d'
+                            '/gfsforecast', 'forcing.tropicalcyclone.vortexmodel': 'NA'})
 
         # check the result
         assert ret_val == run_props
