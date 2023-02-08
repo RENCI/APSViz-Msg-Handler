@@ -16,6 +16,14 @@ from src.common.queue_utils import QueueUtils
 from src.common.asgs_db import AsgsDb
 from src.common.asgs_constants import AsgsConstants
 
+# these are the currently expected ecflow params that were transformed into ASGS legacy params
+expected_transformed_params: dict = {'physical_location': 'ht-ncfs.renci.org', 'monitoring.rmqmessaging.locationname': 'ht-ncfs.renci.org',
+                            'instance_name': 'ec95d', 'instancename': 'ec95d', 'uid': '90161888', 'ADCIRCgrid': 'ec95d', 'adcirc.gridname': 'ec95d',
+                            'currentdate': '230206', 'currentcycle': '12', 'advisory': 'NA', 'asgs.enstorm': 'gfsforecast', 'enstorm': 'gfsforecast',
+                            'stormname': 'none', 'forcing.tropicalcyclone.stormname': 'none', 'config.coupling.waves': '0',
+                            'downloadurl': 'https://apsviz-thredds-dev.apps.renci.org/thredds/fileServer/2023/gfs/2023020612/ec95d/ht-ncfs.renci.org'
+                                           '/ec95d/gfsforecast', 'forcing.tropicalcyclone.vortexmodel': 'NA'}
+
 
 def test_insert_ecflow_config_items():
     """
@@ -40,12 +48,7 @@ def test_insert_ecflow_config_items():
     ret_val = queue_utils.transform_ecflow_to_asgs(run_props)
 
     # add in the expected transformations
-    run_props.update({'physical_location': 'ht-ncfs.renci.org', 'monitoring.rmqmessaging.locationname': 'ht-ncfs.renci.org', 'instance_name': 'ec95d',
-                      'instancename': 'ec95d', 'uid': '90161888', 'ADCIRCgrid': 'ec95d', 'adcirc.gridname': 'ec95d', 'currentdate': '230206',
-                      'currentcycle': '12', 'advisory': 'NA', 'asgs.enstorm': 'gfsforecast', 'enstorm': 'gfsforecast', 'stormname': 'none',
-                      'forcing.tropicalcyclone.stormname': 'none', 'config.coupling.waves': '0',
-                      'downloadurl': 'https://apsviz-thredds-dev.apps.renci.org/thredds/fileServer/2023/gfs/2023020612/ec95d/ht-ncfs.renci.org/ec95d'
-                                     '/gfsforecast', 'forcing.tropicalcyclone.vortexmodel': 'NA'})
+    run_props.update(expected_transformed_params)
 
     # check the result
     assert ret_val == run_props

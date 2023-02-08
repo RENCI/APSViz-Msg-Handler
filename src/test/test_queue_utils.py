@@ -12,6 +12,7 @@
 import os
 import json
 
+import test_ecflow_msg_handler as msg_tester
 from src.common.queue_utils import QueueUtils
 
 
@@ -31,14 +32,8 @@ def test_ecflow_transformer():
         # get the transformed list
         ret_val = queue_utils.transform_ecflow_to_asgs(run_props)
 
-        # add in the expected transformations
-        run_props.update(
-            {'physical_location': 'ht-ncfs.renci.org', 'monitoring.rmqmessaging.locationname': 'ht-ncfs.renci.org', 'instance_name': 'ec95d',
-             'instancename': 'ec95d', 'uid': '90161888', 'ADCIRCgrid': 'ec95d', 'adcirc.gridname': 'ec95d', 'currentdate': '230206',
-             'currentcycle': '12', 'advisory': 'NA', 'asgs.enstorm': 'gfsforecast', 'enstorm': 'gfsforecast', 'stormname': 'none',
-             'forcing.tropicalcyclone.stormname': 'none', 'config.coupling.waves': '0',
-             'downloadurl': 'https://apsviz-thredds-dev.apps.renci.org/thredds/fileServer/2023/gfs/2023020612/ec95d/ht-ncfs.renci.org/ec95d'
-                            '/gfsforecast', 'forcing.tropicalcyclone.vortexmodel': 'NA'})
+        # add in the expected transformations. use the same expected params declared in the msg handler test
+        run_props.update(msg_tester.expected_transformed_params)
 
         # check the result
         assert ret_val == run_props
