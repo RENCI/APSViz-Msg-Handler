@@ -320,23 +320,11 @@ class QueueCallbacks:
 
                     # we must have an existing instance id
                     if instance_id > 0:
-                        # get the configuration params
-                        param_list = msg_obj.get("param_list")
+                        # insert the records
+                        ret_msg = self.asgs_db.insert_ecflow_config_items(instance_id, msg_obj, 'new')
 
-                        if param_list is not None:
-                            # insert the records
-                            ret_msg = self.asgs_db.insert_ecflow_config_items(instance_id, param_list, 'ECFLOW')
-
-                            if ret_msg is not None:
-                                err_msg = f'{context}: Error - DB insert for run properties message failed: {ret_msg}, ignoring message.'
-                                self.logger.error(err_msg)
-
-                                # send a message to slack
-                                self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
-
-                        else:
-                            err_msg = f"{context}: Error invalid message - 'param_list' key is missing from the run properties message. Ignoring " \
-                                      "message."
+                        if ret_msg is not None:
+                            err_msg = f'{context}: Error - DB insert for run properties message failed: {ret_msg}, ignoring message.'
                             self.logger.error(err_msg)
 
                             # send a message to slack
