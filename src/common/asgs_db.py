@@ -159,7 +159,7 @@ class AsgsDb:
             # execute the sql
             self.cursor.execute(sql_stmt)
 
-           # self.logger.debug("sql_stmt executed.")
+            # self.logger.debug("sql_stmt executed.")
 
             # get the returned value
             if b_fetch:
@@ -253,6 +253,7 @@ class AsgsDb:
         """
         self.logger.debug("start_ts: %s, site_id: %s, process_id: %s, instance_name: %s", start_ts, site_id, process_id, instance_name)
 
+        # build up the sql statement to
         sql_stmt = f"SELECT id FROM \"ASGS_Mon_instance\" WHERE CAST(start_ts as DATE)='{start_ts[:10]}' AND site_id={site_id} AND " \
                    f"process_id={process_id} AND instance_name='{instance_name}'"
 
@@ -282,6 +283,7 @@ class AsgsDb:
         # get the advisory id
         advisory_id = msg_obj.get("advisory_number", "N/A") if (msg_obj.get("advisory_number", "N/A") != "") else "N/A"
 
+        # build up the sql statement to update the event group
         sql_stmt = f"UPDATE \"ASGS_Mon_event_group\" SET state_type_id ={state_id}, storm_name='{storm_name}', advisory_id='{advisory_id}' " \
                    f"WHERE id={event_group_id}"
 
@@ -306,6 +308,7 @@ class AsgsDb:
         # get the run params
         run_params = msg_obj.get("run_params", "N/A") if (msg_obj.get("run_params", "N/A") != "") else "N/A"
 
+        # build up the sql statement to update the instance
         sql_stmt = f"UPDATE \"ASGS_Mon_instance\" SET inst_state_type_id = {state_id}, end_ts = '{end_ts}', run_params = '{run_params}' " \
                    f"WHERE site_id = {site_id} AND id={instance_id}"
 
@@ -320,6 +323,7 @@ class AsgsDb:
         """
         self.logger.debug("msg: %s", msg)
 
+        # build up the sql statement to insert the json data
         sql_stmt = f"INSERT INTO \"ASGS_Mon_json\" (data) VALUES ('{msg}')"
 
         self.exec_sql(sql_stmt)
@@ -393,6 +397,7 @@ class AsgsDb:
         # get the event advisory data
         advisory_id = msg_obj.get("advisory_number", "N/A") if (msg_obj.get("advisory_number", "N/A") != "") else "N/A"
 
+        # build up the sql statement to insert the event
         sql_stmt = 'INSERT INTO "ASGS_Mon_event_group" (state_type_id, instance_id, event_group_ts, storm_name, storm_number, advisory_id, ' \
                    f"final_product) VALUES ({state_id}, {instance_id}, '{event_group_ts}', '{storm_name}', '{storm_number}', '{advisory_id}'" \
                    f", 'product') RETURNING id"
@@ -432,6 +437,7 @@ class AsgsDb:
         # instance_id = get_instance_id(start_ts, site_id, process_id, instance_name)
         # if (instance_id < 0):
 
+        # build up the sql statement to insert the run instance
         sql_stmt = f"INSERT INTO \"ASGS_Mon_instance\" (site_id, process_id, start_ts, end_ts, run_params, instance_name, inst_state_type_id) " \
                    f"VALUES ({site_id}, {process_id}, '{start_ts}', '{end_ts}', '{run_params}', '{instance_name}', {state_id}) RETURNING id"
 
@@ -441,7 +447,7 @@ class AsgsDb:
 
         return inst
 
-    def insert_ecflow_config_items(self, instance_id: str, params: dict, supervisor_job_status: str = 'new'):
+    def insert_ecflow_config_items(self, instance_id: int, params: dict, supervisor_job_status: str = 'new'):
         """
         Inserts the ECFLOW configuration parameters into the database
 
@@ -464,56 +470,60 @@ class AsgsDb:
             # get the enstorm value
             enstorm = params['enstorm']
 
-            if advisory and enstorm:
+            # confirm we have the params
+            if not advisory or not enstorm:
+                ret_msg = "Error: 'advisory' and/or 'enstorm' parameters not found."
+                self.logger.exception(ret_msg)
+                raise ret_msg
+            else:
                 # build up the unique ID
                 uid = str(advisory) + "-" + str(enstorm)
-            else:
-                ret_msg = "'advisory' and or 'enstorm' not found in param_list"
-                self.logger.error(ret_msg)
 
-            self.logger.debug("uid: %s", uid)
+                self.logger.debug("uid: %s", uid)
 
-            sql_stmt = f"DELETE FROM public.\"ASGS_Mon_config_item\" WHERE instance_id = {instance_id} AND uid = '{uid}'"
+                # build up the sql to remove old entries
+                sql_stmt = f"DELETE FROM public.\"ASGS_Mon_config_item\" WHERE instance_id = {instance_id} AND uid = '{uid}'"
 
-            # remove all duplicate records that may already exist
-            self.exec_sql(sql_stmt)
+                # remove all duplicate records that may already exist
+                self.exec_sql(sql_stmt)
 
-            self.logger.debug("sql_stmt: %s", sql_stmt)
+                self.logger.debug("sql_stmt: %s", sql_stmt)
 
-            # get the list of values
-            values_list = [f"({instance_id}, '{uid}', '{k}', '{v}')" for (k, v) in params.items()]
+                # get the list of values
+                values_list = [f"({instance_id}, '{uid}', '{k}', '{v}')" for (k, v) in params.items()]
 
-            # create a massive insert statement
-            sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES {','.join(values_list)}"
+                # create a massive insert statement
+                sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES {','.join(values_list)}"
 
-            self.logger.debug("sql_stmt: %s", sql_stmt)
+                self.logger.debug("sql_stmt: %s", sql_stmt)
 
-            # execute the sql
-            self.exec_sql(sql_stmt)
+                # execute the sql
+                self.exec_sql(sql_stmt)
 
-            # add a run property to inform the supervisor of the workflow type
-            sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
-                       f", 'workflow_type', 'ECFLOW')"
+                # add a run property to inform the supervisor of the workflow type
+                sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
+                           f", 'workflow_type', 'ECFLOW')"
 
-            self.logger.debug("sql_stmt: %s", sql_stmt)
+                self.logger.debug("sql_stmt: %s", sql_stmt)
 
-            # execute the sql
-            self.exec_sql(sql_stmt)
+                # execute the sql
+                self.exec_sql(sql_stmt)
 
-            # add a run property to inform the supervisor process this run
-            sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
-                       f", 'supervisor_job_status', '{supervisor_job_status}')"
+                # add a run property to inform the supervisor process this run
+                sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
+                           f", 'supervisor_job_status', '{supervisor_job_status}')"
 
-            self.logger.debug("sql_stmt: %s", sql_stmt)
+                self.logger.debug("sql_stmt: %s", sql_stmt)
 
-            # execute the sql
-            self.exec_sql(sql_stmt)
+                # execute the sql
+                self.exec_sql(sql_stmt)
 
         except Exception:
             ret_msg = "Exception inserting config items"
             self.logger.exception(ret_msg)
             return ret_msg
 
+        # return to the caller
         return ret_msg
 
     def insert_asgs_config_items(self, instance_id, param_list):
@@ -522,7 +532,6 @@ class AsgsDb:
 
         :param instance_id:
         :param param_list:
-        :param workflow_type:
         :return:
         """
 
@@ -553,9 +562,11 @@ class AsgsDb:
                 else:
                     ret_msg = "'enstorm' not found in param_list"
                     self.logger.error(ret_msg)
+                    raise ret_msg
             else:
                 ret_msg = "'advisory' not found in param_list"
                 self.logger.error(ret_msg)
+                raise ret_msg
 
             self.logger.debug("uid: %s", uid)
 
@@ -600,4 +611,5 @@ class AsgsDb:
             self.logger.exception(ret_msg)
             return ret_msg
 
+        # return to the caller
         return ret_msg
