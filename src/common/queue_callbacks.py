@@ -69,8 +69,8 @@ class QueueCallbacks:
         :param body:
         :return:
         """
-        self.logger.info("Received ASGS status msg. Body is %s bytes.", len(body))
-        self.logger.debug("Received ASGS status msg. channel: %s, method: %s, properties: %s.", channel, method, properties)
+        self.logger.debug("Received ASGS status msg. Body is %s bytes, channel: %s, method: %s, properties: %s.", len(body), channel, method,
+                          properties)
 
         context = 'asgs_status_msg_callback()'
 
@@ -169,8 +169,8 @@ class QueueCallbacks:
         # init the return message
         ret_msg = None
 
-        self.logger.info("Received ASGS run props msg. Body is %s bytes.", len(body))
-        self.logger.debug("Received ASGS run props msg. channel: %s, method: %s, properties: %s", channel, method, properties)
+        self.logger.info("Received ASGS run props msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method,
+                         properties)
 
         context = "asgs_run_props_callback()"
 
@@ -224,7 +224,7 @@ class QueueCallbacks:
 
                         else:
                             err_msg = f"{context}: Error invalid message - 'param_list' key is missing from the run properties message. Ignoring " \
-                                       "message."
+                                      "message."
                             self.logger.error(err_msg)
 
                             # send a message to slack
@@ -269,8 +269,8 @@ class QueueCallbacks:
         # init the return message
         ret_msg = None
 
-        self.logger.info("Received ECFlow_rp run props msg. Body is %s bytes.", len(body))
-        self.logger.debug("Received ECFlow_rp run props msg. channel: %s, method: %s, properties: %s", channel, method, properties)
+        self.logger.info("Received ECFlow_rp run props msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method,
+                         properties)
 
         # set the slack/log message context
         context = "ecflow_run_props_callback()"
@@ -330,7 +330,7 @@ class QueueCallbacks:
 
                         else:
                             err_msg = f"{context}: Error invalid message - 'param_list' key is missing from the run properties message. Ignoring " \
-                                       "message."
+                                      "message."
                             self.logger.error(err_msg)
 
                             # send a message to slack
@@ -364,8 +364,8 @@ class QueueCallbacks:
         :param body:
         :return:
         """
-        self.logger.info("Received ECFlow_rt run props msg. Body is %s bytes.", len(body))
-        self.logger.debug("Received ECFlow_rt run props msg. channel: %s, method: %s, properties: %s.", channel, method, properties)
+        self.logger.debug("Received ECFlow_rt status msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method,
+                          properties)
 
         # if there is a relay host set send the message over there
         if os.environ.get("RELAY_RABBITMQ_HOST"):
@@ -382,8 +382,8 @@ class QueueCallbacks:
         :param body:
         :return:
         """
-        self.logger.info("Received HEC/RAS msg. Body is %s bytes.", len(body))
-        self.logger.debug("Received HEC/RAS msg. channel: %s, method: %s, properties: %s.", channel, method, properties)
+        self.logger.debug("Received HEC/RAS msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method,
+                          properties)
 
         # if there is a relay host set send the message over there
         if os.environ.get("RELAY_RABBITMQ_HOST"):
