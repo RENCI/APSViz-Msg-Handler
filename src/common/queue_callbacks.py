@@ -171,8 +171,8 @@ class QueueCallbacks:
         # init the return message
         ret_msg = None
 
-        self.logger.info("Received ASGS run props msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method,
-                         properties)
+        self.logger.debug("Received ASGS run props msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method,
+                          properties)
 
         self.logger.debug(f'Received ASGS run props msg: {body}')
 
@@ -273,8 +273,8 @@ class QueueCallbacks:
         # init the return message
         ret_msg = None
 
-        self.logger.info("Received ECFlow_rp run props msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method,
-                         properties)
+        self.logger.debug("Received ECFlow_rp run props msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method,
+                          properties)
 
         self.logger.debug(f'Received ECFlow_rp msg: {body}')
 
@@ -390,7 +390,7 @@ class QueueCallbacks:
         :param body:
         :return:
         """
-        self.logger.info("Received HEC/RAS msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method, properties)
+        self.logger.debug("Received HEC/RAS msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method, properties)
 
         self.logger.debug(f'Received HEC/RAS msg: {body}')
 
