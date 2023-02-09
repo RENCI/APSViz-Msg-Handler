@@ -72,6 +72,8 @@ class QueueCallbacks:
         self.logger.debug("Received ASGS status msg. Body is %s bytes, channel: %s, method: %s, properties: %s.", len(body), channel, method,
                           properties)
 
+        self.logger.debug(f'Received ASGS status msg: {body}')
+
         context = 'asgs_status_msg_callback()'
 
         # load the message
@@ -171,6 +173,8 @@ class QueueCallbacks:
 
         self.logger.info("Received ASGS run props msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method,
                          properties)
+
+        self.logger.debug(f'Received ASGS run props msg: {body}')
 
         context = "asgs_run_props_callback()"
 
@@ -272,6 +276,8 @@ class QueueCallbacks:
         self.logger.info("Received ECFlow_rp run props msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method,
                          properties)
 
+        self.logger.debug(f'Received ECFlow_rp msg: {body}')
+
         # set the slack/log message context
         context = "ecflow_run_props_callback()"
 
@@ -367,6 +373,8 @@ class QueueCallbacks:
         self.logger.debug("Received ECFlow_rt status msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method,
                           properties)
 
+        self.logger.debug(f'Received ECFlow_rt msg: {body}')
+
         # if there is a relay host set send the message over there
         if os.environ.get("RELAY_RABBITMQ_HOST"):
             # send the message along to another queue
@@ -382,8 +390,9 @@ class QueueCallbacks:
         :param body:
         :return:
         """
-        self.logger.debug("Received HEC/RAS msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method,
-                          properties)
+        self.logger.info("Received HEC/RAS msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method, properties)
+
+        self.logger.debug(f'Received HEC/RAS msg: {body}')
 
         # if there is a relay host set send the message over there
         if os.environ.get("RELAY_RABBITMQ_HOST"):
