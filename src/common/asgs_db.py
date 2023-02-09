@@ -474,7 +474,6 @@ class AsgsDb:
             if not advisory or not enstorm:
                 ret_msg = "Error: 'advisory' and/or 'enstorm' parameters not found."
                 self.logger.exception(ret_msg)
-                raise ret_msg
             else:
                 # build up the unique ID
                 uid = str(advisory) + "-" + str(enstorm)
@@ -548,64 +547,56 @@ class AsgsDb:
             # get the advisory param
             advisory = param_list[param_list.index(param)][param.index('advisory') + 1]
 
-            if advisory:
-                # get the param for the enstorm
-                param = [x for x in param_list if 'enstorm' in x][0]
+            # get the param for the enstorm
+            param = [x for x in param_list if 'enstorm' in x][0]
 
-                # get the enstorm param
-                enstorm = param_list[param_list.index(param)][param.index('enstorm') + 1]
+            # get the enstorm param
+            enstorm = param_list[param_list.index(param)][param.index('enstorm') + 1]
 
-                # DID WE GET IT
-                if enstorm:
-                    # build up the unique ID
-                    uid = str(advisory) + "-" + str(enstorm)
-                else:
-                    ret_msg = "'enstorm' not found in param_list"
-                    self.logger.error(ret_msg)
-                    raise ret_msg
-            else:
-                ret_msg = "'advisory' not found in param_list"
+            if not advisory or not enstorm:
+                ret_msg = "'advisory' and/or 'enstorm' not found in param list"
                 self.logger.error(ret_msg)
-                raise ret_msg
+            else:
+                # build up the unique ID
+                uid = str(advisory) + "-" + str(enstorm)
 
-            self.logger.debug("uid: %s", uid)
+                self.logger.debug("uid: %s", uid)
 
-            sql_stmt = f"DELETE FROM public.\"ASGS_Mon_config_item\" WHERE instance_id = {instance_id} AND uid = '{uid}'"
+                sql_stmt = f"DELETE FROM public.\"ASGS_Mon_config_item\" WHERE instance_id = {instance_id} AND uid = '{uid}'"
 
-            # remove all duplicate records that may already exist
-            self.exec_sql(sql_stmt)
+                # remove all duplicate records that may already exist
+                self.exec_sql(sql_stmt)
 
-            self.logger.debug("sql_stmt: %s", sql_stmt)
+                self.logger.debug("sql_stmt: %s", sql_stmt)
 
-            # get the list of values
-            values_list = [f"({instance_id}, '{uid}', '{x[0]}', '{x[1]}')" for x in param_list]
+                # get the list of values
+                values_list = [f"({instance_id}, '{uid}', '{x[0]}', '{x[1]}')" for x in param_list]
 
-            # create a massive insert statement
-            sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES {','.join(values_list)}"
+                # create a massive insert statement
+                sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES {','.join(values_list)}"
 
-            self.logger.debug("sql_stmt: %s", sql_stmt)
+                self.logger.debug("sql_stmt: %s", sql_stmt)
 
-            # execute the sql
-            self.exec_sql(sql_stmt)
+                # execute the sql
+                self.exec_sql(sql_stmt)
 
-            # add a run property to inform the supervisor of the workflow type
-            sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
-                       f", 'workflow_type', 'ASGS')"
+                # add a run property to inform the supervisor of the workflow type
+                sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
+                           f", 'workflow_type', 'ASGS')"
 
-            self.logger.debug("sql_stmt: %s", sql_stmt)
+                self.logger.debug("sql_stmt: %s", sql_stmt)
 
-            # execute the sql
-            self.exec_sql(sql_stmt)
+                # execute the sql
+                self.exec_sql(sql_stmt)
 
-            # add a run property to inform the supervisor process this run
-            sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
-                       f", 'supervisor_job_status', 'new')"
+                # add a run property to inform the supervisor process this run
+                sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
+                           f", 'supervisor_job_status', 'new')"
 
-            self.logger.debug("sql_stmt: %s", sql_stmt)
+                self.logger.debug("sql_stmt: %s", sql_stmt)
 
-            # execute the sql
-            self.exec_sql(sql_stmt)
-
+                # execute the sql
+                self.exec_sql(sql_stmt)
         except Exception:
             ret_msg = "Exception inserting config items"
             self.logger.exception(ret_msg)
