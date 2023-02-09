@@ -236,7 +236,7 @@ class QueueCallbacks:
                         # send a message to slack
                         self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
                 else:
-                    err_msg = f"{context}: Error - Site %s not supported. Ignoring message."
+                    err_msg = f"{context}: Error - Site {site_id} not supported. Ignoring message."
                     self.logger.error(err_msg)
 
                     # send a message to slack
@@ -342,7 +342,7 @@ class QueueCallbacks:
                         # send a message to slack
                         self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
                 else:
-                    err_msg = f"{context}: Error - Site %s not supported. Ignoring message."
+                    err_msg = f"{context}: Error - Site {site_id} not supported. Ignoring message."
                     self.logger.error(err_msg)
 
                     # send a message to slack
