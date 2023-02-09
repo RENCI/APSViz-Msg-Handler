@@ -8,15 +8,18 @@ SPDX-License-Identifier: MIT
 
 ![image not found](renci-logo.png "RENCI")
 
-# APSViz-m
-RabbitMQ message handlers for the APSViz project.
+# APSViz RabbitMQ Message Handler
+RabbitMQ message handlers for the APSViz project, including handlers for:
+ - The ASGS run-time status and run properties queues
+ - The ECFLOW run-time status and run properties queues
+ - The HEC/RAS queue
 
 #### Licenses...
 [![MIT License](https://img.shields.io/badge/License-MIT-red.svg)](https://github.com/RENCI/APSViz-Msg-Handler/blob/master/LICENSE)
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
 [![RENCI License](https://img.shields.io/badge/License-RENCI-blue.svg)](https://renci.org/)
 #### Components and versions...
-[![Python](https://img.shields.io/badge/Python-3.10.8-orange)](https://github.com/PyCQA/pylint)
+[![Python](https://img.shields.io/badge/Python-3.11.1-orange)](https://github.com/PyCQA/pylint)
 [![Linting Pylint](https://img.shields.io/badge/Pylint-%202.15.5-yellowgreen)](https://github.com/PyCQA/pylint)
 #### Build status...
 [![Pylint](https://github.com/RENCI/APSViz-Msg-Handler/actions/workflows/pylint.yml/badge.svg)](https://github.com/RENCI/APSViz-Msg-Handler/actions/workflows/pylint.yml)
