@@ -111,6 +111,7 @@ class AsgsConstants:
         cct = self.get_lu_id('CCT', 'site')
         psc = self.get_lu_id('PSC', 'site')
         psc_ec = self.get_lu_id('bridges2.psc.edu', 'site')
+        renci_ec = self.get_lu_id('ht-ncfs.renci.org', 'site')
 
         # return the list of ids
-        return [cct, loni, lsu, penguin, psc, psc_ec, qb2, renci, seahorse, tacc]
+        return [cct, loni, lsu, penguin, psc, psc_ec, qb2, renci, renci_ec, seahorse, tacc]
