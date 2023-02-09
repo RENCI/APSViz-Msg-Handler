@@ -12,7 +12,7 @@
 import os
 import json
 
-import test_ecflow_msg_handler as msg_tester
+import test_msg_handlers as msg_tester
 from src.common.queue_utils import QueueUtils
 
 
