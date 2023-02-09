@@ -41,15 +41,15 @@ class QueueUtils:
             # create a logger
             self.logger = LoggingUtil.init_logging("APSVIZ.Msg-handler.QueueUtils", level=log_level, line_format='medium', log_file_path=log_path)
 
-            # declare the ECFlow target params to asgs keys dict
-            self.ecflow_transform_params = {'suite.physical_location': ['physical_location', 'monitoring.rmqmessaging.locationname'],
-                                            'suite.instance_name': ['instance_name', 'instancename'], 'suite.project_code': [], 'suite.uid': ['uid'],
-                                            'suite.adcirc.gridname': ['ADCIRCgrid', 'adcirc.gridname'], 'time.currentdate': ['currentdate'],
-                                            'time.currentcycle': ['currentcycle'], 'forcing.advisory': ['advisory'],
-                                            'forcing.ensemblename': ['asgs.enstorm', 'enstorm'], 'forcing.metclass': [],
-                                            'forcing.stormname': ['stormname', 'forcing.tropicalcyclone.stormname'],
-                                            'forcing.waves': ['config.coupling.waves'], 'forcing.stormnumber': ['storm'],
-                                            'output.downloadurl': ['downloadurl'], 'forcing.vortexmodel': ['forcing.tropicalcyclone.vortexmodel']}
+        # declare the ECFlow target params to asgs keys dict
+        self.ecflow_transform_params = {'suite.physical_location': ['physical_location', 'monitoring.rmqmessaging.locationname'],
+                                        'suite.instance_name': ['instance_name', 'instancename'], 'suite.project_code': [], 'suite.uid': ['uid'],
+                                        'suite.adcirc.gridname': ['ADCIRCgrid', 'adcirc.gridname'], 'time.currentdate': ['currentdate'],
+                                        'time.currentcycle': ['currentcycle'], 'forcing.advisory': ['advisory'],
+                                        'forcing.ensemblename': ['asgs.enstorm', 'enstorm'], 'forcing.metclass': [],
+                                        'forcing.stormname': ['stormname', 'forcing.tropicalcyclone.stormname'],
+                                        'forcing.waves': ['config.coupling.waves'], 'forcing.stormnumber': ['storm'],
+                                        'output.downloadurl': ['downloadurl'], 'forcing.vortexmodel': ['forcing.tropicalcyclone.vortexmodel']}
 
         # save the queue name
         self.queue_name = _queue_name
