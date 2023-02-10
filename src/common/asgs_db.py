@@ -11,7 +11,6 @@
 """
 
 import os
-import re
 import datetime
 import time
 import psycopg2
@@ -359,7 +358,7 @@ class AsgsDb:
         if msg_obj.get("message") is not None and len(msg_obj["message"]) > 0:
             # get rid of any special chars that might mess up postgres
             # backslashes, quote, and double quotes for now
-            msg_line = re.sub(r'\\\|\'|\"', '', msg_obj["message"])
+            msg_line = msg_obj["message"].replace('\\', '').replace("'", '').replace('"', '')
 
             raw_data_col = ", raw_data"
             msg_line = f", '{msg_line}'"
