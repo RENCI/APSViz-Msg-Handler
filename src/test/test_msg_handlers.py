@@ -15,6 +15,7 @@ import json
 from src.common.queue_utils import QueueUtils
 from src.common.asgs_db import AsgsDb
 from src.common.asgs_constants import AsgsConstants
+from src.common.queue_callbacks import QueueCallbacks
 
 # these are the currently expected ecflow params that were transformed into ASGS legacy params
 expected_transformed_params: dict = {'physical_location': 'ht-ncfs.renci.org', 'monitoring.rmqmessaging.locationname': 'ht-ncfs.renci.org',
@@ -67,3 +68,23 @@ def test_insert_ecflow_config_items():
 
     # test the result, empty str == success
     assert ret_val is None
+
+
+def test_ecflow_queue_callback():
+    """
+    Tests the handling of a ecflow run time msg
+
+    :return:
+    """
+    # load the json
+    with open(os.path.join(os.path.dirname(__file__), 'test_ecflow_run_time.json'), encoding='UTF-8') as test_fh:
+        msg = test_fh.readline()
+
+    # instantiate the utility class
+    queue_callback = QueueCallbacks(_queue_name='', _logger=None)
+
+    # call the msg handler callback
+    success = queue_callback.ecflow_run_time_status_callback(None, None, None, msg)
+
+    # check for pass/fail
+    assert success is True
