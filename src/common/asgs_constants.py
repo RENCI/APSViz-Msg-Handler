@@ -21,8 +21,7 @@ class AsgsConstants:
 
     # define the LU constant lookups
     pct_complete_lu = {'0': 0, '1': 5, '2': 20, '3': 40, '4': 60, '5': 90, '6': 100, '7': 0, '8': 0, '9': 0, '10': 40, '11': 90}
-    site_lu = {'RENCI': 0, 'TACC': 1, 'LSU': 2, 'UCF': 3, 'George Mason': 4, 'Penguin': 5, 'LONI': 6, 'Seahorse': 7, 'QB2': 8, 'CCT': 9, 'PSC': 10,
-               'bridges2.psc.edu': 11, 'ht-ncfs.renci.org': 12}
+    site_lu = {'RENCI': 0, 'TACC': 1, 'LSU': 2, 'UCF': 3, 'George Mason': 4, 'Penguin': 5, 'LONI': 6, 'Seahorse': 7, 'QB2': 8, 'CCT': 9, 'PSC': 10}
     event_type_lu = {'RSTR': 0, 'PRE1': 1, 'NOWC': 2, 'PRE2': 3, 'FORE': 4, 'POST': 5, 'REND': 6, 'STRT': 7, 'HIND': 8, 'EXIT': 9, 'FSTR': 10,
                      'FEND': 11, 'PNOW': 12}
     state_type_lu = {'INIT': 0, 'RUNN': 1, 'PEND': 2, 'FAIL': 3, 'WARN': 4, 'IDLE': 5, 'CMPL': 6, 'NONE': 7, 'WAIT': 8, 'EXIT': 9, 'STALLED': 10}
@@ -110,8 +109,7 @@ class AsgsConstants:
         qb2 = self.get_lu_id('QB2', 'site')
         cct = self.get_lu_id('CCT', 'site')
         psc = self.get_lu_id('PSC', 'site')
-        psc_ec = self.get_lu_id('bridges2.psc.edu', 'site')
-        renci_ec = self.get_lu_id('ht-ncfs.renci.org', 'site')
+
 
         # return the list of ids
-        return [cct, loni, lsu, penguin, psc, psc_ec, qb2, renci, renci_ec, seahorse, tacc]
+        return [cct, loni, lsu, penguin, psc, qb2, renci, seahorse, tacc]
