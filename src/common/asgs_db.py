@@ -41,7 +41,7 @@ class AsgsDb:
             # create a logger
             self.logger = LoggingUtil.init_logging("APSVIZ.Msg-Handler.ASGSDB", level=log_level, line_format='medium', log_file_path=log_path)
 
-        # get configuration params from the pods secrets
+        # get configuration params from the k8s secrets
         username = os.environ.get('ASGS_DB_USERNAME')
         password = os.environ.get('ASGS_DB_PASSWORD')
         host = os.environ.get('ASGS_DB_HOST')
@@ -172,7 +172,6 @@ class AsgsDb:
                     ret_val = -1
                 else:
                     ret_val = ret_val[0]
-
             else:
                 ret_val = -1
 
@@ -483,10 +482,10 @@ class AsgsDb:
                 # build up the sql to remove old entries
                 sql_stmt = f"DELETE FROM public.\"ASGS_Mon_config_item\" WHERE instance_id = {instance_id} AND uid = '{uid}'"
 
+                self.logger.debug("sql_stmt: %s", sql_stmt)
+
                 # remove all duplicate records that may already exist
                 self.exec_sql(sql_stmt)
-
-                self.logger.debug("sql_stmt: %s", sql_stmt)
 
                 # get the list of values
                 values_list = [f"({instance_id}, '{uid}', '{k}', '{v}')" for (k, v) in params.items()]
@@ -508,7 +507,7 @@ class AsgsDb:
                 # execute the sql
                 self.exec_sql(sql_stmt)
 
-                # add a run property to inform the supervisor process this run
+                # add a run property to inform the supervisor to process this run
                 sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
                            f", 'supervisor_job_status', '{supervisor_job_status}')"
 
@@ -518,7 +517,85 @@ class AsgsDb:
                 self.exec_sql(sql_stmt)
 
         except Exception:
-            ret_msg = "Exception inserting config items"
+            ret_msg = "Exception inserting ECFLOW config items"
+            self.logger.exception(ret_msg)
+            return ret_msg
+
+        # return to the caller
+        return ret_msg
+
+    def insert_hecras_config_items(self, instance_id: int, params: dict, supervisor_job_status: str = 'new'):
+        """
+        Inserts the HEC/RAS configuration parameters into the database
+
+        :param instance_id:
+        :param params:
+        :param supervisor_job_status:
+        :return:
+        """
+
+        # init the return value
+        ret_msg = None
+
+        self.logger.debug("param_list: %s", params)
+
+        # get advisory and enstorm values from param_list to create UID
+        try:
+            # get the advisory param
+            advisory = params['advisory']
+
+            # get the enstorm value
+            enstorm = params['enstorm']
+
+            # confirm we have the params
+            if not advisory or not enstorm:
+                ret_msg = "Error: 'advisory' and/or 'enstorm' parameters not found."
+                self.logger.exception(ret_msg)
+            else:
+                # build up the unique ID
+                uid = str(advisory) + "-" + str(enstorm)
+
+                self.logger.debug("uid: %s", uid)
+
+                # build up the sql to remove old entries
+                sql_stmt = f"DELETE FROM public.\"ASGS_Mon_config_item\" WHERE instance_id = {instance_id} AND uid = '{uid}'"
+
+                self.logger.debug("sql_stmt: %s", sql_stmt)
+
+                # remove all duplicate records that may already exist
+                self.exec_sql(sql_stmt)
+
+                # get the list of values
+                values_list = [f"({instance_id}, '{uid}', '{k}', '{v}')" for (k, v) in params.items()]
+
+                # create a massive insert statement
+                sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES {','.join(values_list)}"
+
+                self.logger.debug("sql_stmt: %s", sql_stmt)
+
+                # execute the sql
+                self.exec_sql(sql_stmt)
+
+                # add a run property to inform the supervisor of the workflow type
+                sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
+                           f", 'workflow_type', 'HECRAS')"
+
+                self.logger.debug("sql_stmt: %s", sql_stmt)
+
+                # execute the sql
+                self.exec_sql(sql_stmt)
+
+                # add a run property to inform the supervisor to process this run
+                sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES ({instance_id}, '{uid}'" \
+                           f", 'supervisor_job_status', '{supervisor_job_status}')"
+
+                self.logger.debug("sql_stmt: %s", sql_stmt)
+
+                # execute the sql
+                self.exec_sql(sql_stmt)
+
+        except Exception:
+            ret_msg = "Exception inserting HECRAS config items"
             self.logger.exception(ret_msg)
             return ret_msg
 
