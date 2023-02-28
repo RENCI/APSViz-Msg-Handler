@@ -164,7 +164,7 @@ class QueueUtils:
         # return pass/fail
         return ret_val
 
-    def transform_ecflow_to_asgs(self, run_params: dict) -> dict:
+    def transform_msg_to_asgs_legacy(self, run_params: dict) -> dict:
         """
         Transforms a ECFlow message into an ASGS message
 
