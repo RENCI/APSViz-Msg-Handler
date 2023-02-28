@@ -270,7 +270,7 @@ class QueueCallbacks:
         The callback function for the ecflow run properties message queue
 
         Note - the supervisor is expecting the following mappings:
-        'adcirc.gridname' = suite.adcirc.grid
+        'adcirc.gridname' = suite.adcirc.gridname
         'instancename' = suite.instance_name
         'supervisor_job_status' = 'new'
         'forcing.stormname' = forcing.stormname
@@ -300,7 +300,7 @@ class QueueCallbacks:
             msg_obj: json = json.loads(body)
 
             # transform the ecflow messages into the asgs equivalent
-            msg_obj = self.queue_utils.transform_ecflow_to_asgs(msg_obj)
+            msg_obj = self.queue_utils.transform_msg_to_asgs_legacy(msg_obj)
 
             # get the site id from the name in the message
             site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site")
@@ -474,9 +474,17 @@ class QueueCallbacks:
         # return the success flag
         return ret_val
 
-    def hec_ras_callback(self, channel, method, properties, body):
+    def hecras_run_props_callback(self, channel, method, properties, body):
         """
-        The callback function for the HEC/RAS message queue
+        The callback function for the hec/ras run properties message queue
+
+        Note - the supervisor is expecting the following mappings:
+        'adcirc.gridname' = suite.adcirc.gridname
+        'instancename' = suite.instance_name
+        'supervisor_job_status' = 'new'
+        'forcing.stormname' = forcing.stormname
+        'workflow_type' = 'hecras'
+        '%downloadurl%' = output.downloadurl
 
         :param channel:
         :param method:
@@ -484,11 +492,79 @@ class QueueCallbacks:
         :param body:
         :return:
         """
+        # init the return message
+        ret_msg = None
+
         self.logger.debug("Received HEC/RAS msg. Body is %s bytes, channel: %s, method: %s, properties: %s", len(body), channel, method, properties)
 
         self.logger.debug('Received HEC/RAS msg %s', body)
 
-        # if there is a relay host set send the message over there
-        if os.environ.get("RELAY_RABBITMQ_HOST"):
-            # send the message along to another queue
-            self.queue_utils.relay_msg('relay_queue', body)
+        # set the slack/log message context
+        context = "hecras_run_props_callback()"
+
+        # load the message
+        try:
+            # load the json
+            msg_obj: json = json.loads(body)
+
+            # transform the ecflow messages into the asgs equivalent
+            msg_obj = self.queue_utils.transform_msg_to_asgs_legacy(msg_obj)
+
+            # get the site id from the name in the message
+            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site")
+
+            # insure we have a legit location
+            if site_id is None or site_id[0] < 0:
+                # create the error message
+                err_msg = f'{context}: ERROR Unknown physical location {msg_obj.get("physical_location", "")}, Ignoring message'
+
+                # log the event
+                self.logger.error(err_msg)
+
+                # send a message to slack
+                self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
+            else:
+                self.logger.debug("site_id: %s", str(site_id))
+
+                # filter out handing - accept runs for all locations, except UCF and George Mason runs for now
+                site_ids = self.asgs_constants.get_site_ids()
+
+                # init the instance id
+                instance_id: int = 0
+
+                # check the site id
+                if site_id[0] in site_ids:
+                    # get the instance id
+                    instance_id = self.asgs_db.get_existing_instance_id(site_id[0], msg_obj)
+
+                    self.logger.info("instance_id: %s", str(instance_id))
+
+                    # we must have an existing instance id
+                    if instance_id > 0:
+                        # insert the records
+                        ret_msg = self.asgs_db.insert_hecras_config_items(instance_id, msg_obj, 'new')
+
+                        if ret_msg is not None:
+                            err_msg = f'{context}: Error - DB insert for run properties message failed: {ret_msg}, ignoring message.'
+                            self.logger.error(err_msg)
+
+                            # send a message to slack
+                            self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
+                    else:
+                        err_msg = f"{context}: Error invalid instance ID. Ignoring message for HEC/RAS {msg_obj.get('physical_location', 'N/A')}."
+                        self.logger.error(err_msg)
+
+                        # send a message to slack
+                        self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
+                else:
+                    err_msg = f"{context}: Error - Site {site_id} not supported. Ignoring message."
+                    self.logger.error(err_msg)
+
+                    # send a message to slack
+                    self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
+        except Exception:
+            err_msg = f"{context}: Error loading the run properties message."
+            self.logger.exception(err_msg)
+
+            # send a message to slack
+            self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
