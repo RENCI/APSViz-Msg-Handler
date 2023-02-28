@@ -16,25 +16,31 @@ import json
 import test_msg_handlers as msg_tester
 from src.common.queue_utils import QueueUtils
 
+# create some test data references so the test can loop
+test_data: list = [['test_ecflow_run_props.json', msg_tester.ecflow_expected_transformed_params],
+                   ['test_hecras_run_props.json', msg_tester.hecras_expected_transformed_params]]
 
-def test_ecflow_transformer():
+
+def test_asgs_legacy_transformer():
     """
-    test the transformation of ecflow run params into asgs run params
+    test the transformation of run params into asgs run params
     :return:
     """
-    # load the test json
-    with open(os.path.join(os.path.dirname(__file__), 'test_ecflow_run_props.json'), encoding='UTF-8') as test_fh:
-        # load the json
-        run_props = json.loads(test_fh.read())
+    # for each set of test data
+    for test_datum in test_data:
+        # load the test json
+        with open(os.path.join(os.path.dirname(__file__), test_datum[0]), encoding='UTF-8') as test_fh:
+            # load the json
+            run_props = json.loads(test_fh.read())
 
-        # instantiate the utility class
-        queue_utils = QueueUtils(_queue_name='', _logger=None)
+            # instantiate the utility class
+            queue_utils = QueueUtils(_queue_name='', _logger=None)
 
-        # get the transformed list
-        ret_val = queue_utils.transform_ecflow_to_asgs(run_props)
+            # get the transformed list
+            ret_val = queue_utils.transform_msg_to_asgs_legacy(run_props)
 
-        # add in the expected transformations. use the same expected params declared in the msg handler test
-        run_props.update(msg_tester.expected_transformed_params)
+            # add in the expected transformations. use the same expected params declared in the msg handler test
+            run_props.update(test_datum[1])
 
-        # check the result
-        assert ret_val == run_props
+            # check the result
+            assert ret_val == run_props
