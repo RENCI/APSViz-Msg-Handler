@@ -180,15 +180,16 @@ class AsgsDb:
             self.logger.exception("FAILURE - DB issue. Incoming SQL %s:", sql_stmt)
             return -1
 
-    def get_existing_event_group_id(self, instance_id, advisory_id):
+    def get_existing_event_group_id(self, instance_id, advisory_id, context: str = 'unknown'):
         """
         just a check to see if there are any event groups defined for this site yet
 
         :param instance_id:
         :param advisory_id:
+        :param context:
         :return:
         """
-        self.logger.debug("instance_id: %s, advisory_id %s", instance_id, advisory_id)
+        self.logger.debug("instance_id: %s, advisory_id %s, context: %s", instance_id, advisory_id, context)
 
         # see if there are any event groups yet that have this instance_id
         # this could be caused by a new install that does not have any data in the DB yet
@@ -327,14 +328,15 @@ class AsgsDb:
 
         self.exec_sql(sql_stmt)
 
-    def insert_event(self, site_id, event_group_id, event_type_id, msg_obj):
+    def insert_event(self, site_id, event_group_id, event_type_id, msg_obj, context: str = 'unknown'):
         """
-        insert an event
+        process the message data and insert an event
 
         :param site_id:
         :param event_group_id:
         :param event_type_id:
         :param msg_obj:
+        :param context:
         :return:
         """
         # get a default time stamp, use it if necessary
@@ -349,7 +351,7 @@ class AsgsDb:
         process = msg_obj.get("process", "N/A") if (msg_obj.get("process", "N/A") != "") else "N/A"
 
         # get the percent complete from a LU lookup
-        pct_complete = self.asgs_constants_inst.get_lu_id(str(event_type_id), "pct_complete")
+        pct_complete = self.asgs_constants_inst.get_lu_id(str(event_type_id), "pct_complete", context)
 
         # get the sub percent complete from the message object
         sub_pct_complete = msg_obj.get("subpctcomplete", pct_complete)
@@ -373,13 +375,14 @@ class AsgsDb:
 
         self.exec_sql(sql_stmt)
 
-    def insert_event_group(self, state_id, instance_id, msg_obj):
+    def insert_event_group(self, state_id, instance_id, msg_obj, context: str = 'unknown'):
         """
         inserts an event group
 
         :param state_id:
         :param instance_id:
         :param msg_obj:
+        :param context:
         :return:
         """
         # get a default time stamp, use it if necessary
@@ -403,11 +406,11 @@ class AsgsDb:
 
         group = self.exec_sql(sql_stmt, True)
 
-        self.logger.debug("group: %s", group)
+        self.logger.debug("group: %s, context: %s", group, context)
 
         return group
 
-    def insert_instance(self, state_id, site_id, msg_obj):
+    def insert_instance(self, state_id, site_id, msg_obj, context: str = 'unknown'):
         """
         inserts an instance
 
@@ -416,6 +419,7 @@ class AsgsDb:
         :param state_id:
         :param site_id:
         :param msg_obj:
+        :param context:
         :return:
         """
         # get a default time stamp, use it if necessary
@@ -442,24 +446,25 @@ class AsgsDb:
 
         instance_id = self.exec_sql(sql_stmt, True)
 
-        self.logger.debug("instance_id %s", instance_id)
+        self.logger.debug("instance_id: %s, context: %s", instance_id, context)
 
         return instance_id
 
-    def insert_ecflow_config_items(self, instance_id: int, params: dict, supervisor_job_status: str = 'new'):
+    def insert_ecflow_config_items(self, instance_id: int, params: dict, supervisor_job_status: str = 'new', context: str = 'unknown'):
         """
         Inserts the ECFLOW configuration parameters into the database
 
         :param instance_id:
         :param params:
         :param supervisor_job_status:
+        :param context:
         :return:
         """
 
         # init the return value
         ret_msg = None
 
-        self.logger.debug("param_list: %s", params)
+        self.logger.debug("param_list: %s, context: %s", params, context)
 
         # get advisory and enstorm values from param_list to create UID
         try:
@@ -471,8 +476,8 @@ class AsgsDb:
 
             # confirm we have the params
             if not advisory or not enstorm:
-                ret_msg = "Error: 'advisory' and/or 'enstorm' parameters not found."
-                self.logger.exception(ret_msg)
+                ret_msg = f"Error: 'advisory' and/or 'enstorm' parameters not found. context: {context}"
+                self.logger.error(ret_msg)
             else:
                 # build up the unique ID
                 uid = str(advisory) + "-" + str(enstorm)
