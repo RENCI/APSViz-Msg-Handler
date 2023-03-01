@@ -13,3 +13,4 @@ min-public-methods=0
 fail-under=9.95
 max-nested-blocks=7
 max-locals=20
+max-args=7
