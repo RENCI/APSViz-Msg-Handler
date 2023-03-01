@@ -440,11 +440,11 @@ class AsgsDb:
         sql_stmt = f"INSERT INTO \"ASGS_Mon_instance\" (site_id, process_id, start_ts, end_ts, run_params, instance_name, inst_state_type_id) " \
                    f"VALUES ({site_id}, {process_id}, '{start_ts}', '{end_ts}', '{run_params}', '{instance_name}', {state_id}) RETURNING id"
 
-        inst = self.exec_sql(sql_stmt, True)
+        instance_id = self.exec_sql(sql_stmt, True)
 
-        self.logger.debug("inst %s", inst)
+        self.logger.debug("instance_id %s", instance_id)
 
-        return inst
+        return instance_id
 
     def insert_ecflow_config_items(self, instance_id: int, params: dict, supervisor_job_status: str = 'new'):
         """
