@@ -202,7 +202,7 @@ class AsgsDb:
         else:
             existing_group_id = -1
 
-        self.logger.debug("existing_group_id: %s", existing_group_id)
+        self.logger.debug("existing_group_id: %s, context: %s", existing_group_id, context)
 
         return existing_group_id
 
@@ -450,21 +450,20 @@ class AsgsDb:
 
         return instance_id
 
-    def insert_ecflow_config_items(self, instance_id: int, params: dict, supervisor_job_status: str = 'new', context: str = 'unknown'):
+    def insert_ecflow_config_items(self, instance_id: int, params: dict, supervisor_job_status: str = 'new'):
         """
         Inserts the ECFLOW configuration parameters into the database
 
         :param instance_id:
         :param params:
         :param supervisor_job_status:
-        :param context:
         :return:
         """
 
         # init the return value
         ret_msg = None
 
-        self.logger.debug("param_list: %s, context: %s", params, context)
+        self.logger.debug("param_list: %s", params)
 
         # get advisory and enstorm values from param_list to create UID
         try:
@@ -476,7 +475,7 @@ class AsgsDb:
 
             # confirm we have the params
             if not advisory or not enstorm:
-                ret_msg = f"Error: 'advisory' and/or 'enstorm' parameters not found. context: {context}"
+                ret_msg = "Error: 'advisory' and/or 'enstorm' parameters not found."
                 self.logger.error(ret_msg)
             else:
                 # build up the unique ID
