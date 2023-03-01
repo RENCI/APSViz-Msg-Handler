@@ -70,16 +70,16 @@ def test_insert_ecflow_config_items():
     assert ret_val == run_props
 
     # get the state type id. lets just set this to running for this test run
-    state_id = asgs_constants.get_lu_id('RUNN', "state_type")
+    state_id = asgs_constants.get_lu_id('RUNN', "state_type", context='test_insert_ecflow_config_items()')
 
     # get the site id
-    site_id = asgs_constants.get_lu_id(run_props.get('suite.physical_location'), 'site')
+    site_id = asgs_constants.get_lu_id(run_props.get('suite.physical_location'), 'site', context='test_insert_ecflow_config_items()')
 
     # insert an instance record into the DB to get things primed
-    instance_id = asgs_db.insert_instance(state_id, site_id, run_props)
+    instance_id = asgs_db.insert_instance(state_id, site_id, run_props, context='test_insert_ecflow_config_items()')
 
     # insert the run params into the DB
-    ret_val = asgs_db.insert_ecflow_config_items(instance_id, run_props, 'debug')
+    ret_val = asgs_db.insert_ecflow_config_items(instance_id, run_props, 'debug', context='test_insert_ecflow_config_items()')
 
     # test the result, empty str == success
     assert ret_val is None
@@ -134,13 +134,13 @@ def test_insert_hecras_config_items():
     assert ret_val == run_props
 
     # get the state type id. lets just set this to running for this test run
-    state_id = asgs_constants.get_lu_id('RUNN', "state_type")
+    state_id = asgs_constants.get_lu_id('RUNN', "state_type", context='test_insert_hecras_config_items()')
 
     # get the site id
-    site_id = asgs_constants.get_lu_id(run_props.get('suite.physical_location'), 'site')
+    site_id = asgs_constants.get_lu_id(run_props.get('suite.physical_location'), 'site', context='test_insert_hecras_config_items()')
 
     # insert an instance record into the DB to get things primed
-    instance_id = asgs_db.insert_instance(state_id, site_id, run_props)
+    instance_id = asgs_db.insert_instance(state_id, site_id, run_props, context='test_insert_hecras_config_items()')
 
     # insert the run params into the DB
     ret_val = asgs_db.insert_hecras_config_items(instance_id, run_props, 'debug')
