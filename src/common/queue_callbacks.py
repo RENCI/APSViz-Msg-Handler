@@ -85,13 +85,13 @@ class QueueCallbacks:
             msg_obj: json = json.loads(body)
 
             # get the site id from the name in the message
-            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site")
+            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
 
             # get the 3vent type if from the event name in the message
-            event_type_id, event_name = self.asgs_constants.get_lu_id_from_msg(msg_obj, "event_type", "event_type")
+            event_type_id, event_name = self.asgs_constants.get_lu_id_from_msg(msg_obj, "event_type", "event_type", context=context)
 
             # get the event type if from the event name in the message
-            state_id, state_name = self.asgs_constants.get_lu_id_from_msg(msg_obj, "state", "state_type")
+            state_id, state_name = self.asgs_constants.get_lu_id_from_msg(msg_obj, "state", "state_type", context=context)
 
             # get the event advisory data
             advisory_id = msg_obj.get("advisory_number", "N/A") if (msg_obj.get("advisory_number", "N/A") != "") else "N/A"
@@ -104,20 +104,20 @@ class QueueCallbacks:
 
                 # if this is a STRT event, create a new instance
                 if instance_id < 0 or (event_name == "STRT" and state_name == "RUNN"):
-                    self.logger.debug("create_new_inst is True - creating new inst")
+                    self.logger.debug("create_new_inst is True - creating new inst. context: %s", context)
 
                     # insert the record
-                    instance_id = self.asgs_db.insert_instance(state_id, site_id[0], msg_obj)
+                    instance_id = self.asgs_db.insert_instance(state_id, site_id[0], msg_obj, context)
 
                 else:  # just update instance
-                    self.logger.debug("create_new_inst is False - updating inst")
+                    self.logger.debug("create_new_inst is False - updating instance id. context: %s", context)
 
                     # update the instance
                     self.asgs_db.update_instance(state_id, site_id[0], instance_id, msg_obj)
 
                 # check to see if there are any event groups for this site_id and inst yet
                 # this might happen if we start up this process in the middle of a model run
-                event_group_id = self.asgs_db.get_existing_event_group_id(instance_id, advisory_id)
+                event_group_id = self.asgs_db.get_existing_event_group_id(instance_id, advisory_id, context)
 
                 # if this is the start of a group of Events, create a new event_group record
                 # qualifying group initiation: event type = RSTR
@@ -129,22 +129,22 @@ class QueueCallbacks:
                 #   after creating first one, when very first RSTR comes for this instance+++++++++++++++++++
 
                 if event_group_id < 0 or (event_name == "RSTR"):
-                    event_group_id = self.asgs_db.insert_event_group(state_id, instance_id, msg_obj)
+                    event_group_id = self.asgs_db.insert_event_group(state_id, instance_id, msg_obj, context)
                 else:
                     # don't need a new event group
-                    self.logger.debug("Reusing event_group_id: %s", event_group_id)
+                    self.logger.debug("Reusing event_group_id: %s, context: %s", event_group_id, context)
 
                     # update event group with this latest state
                     # added 3/6/19 - will set status to EXIT if this is a FEND or REND event_type
                     # will hardcode this state id for now, until I get my messaging refactor delivered
                     if event_name in ['FEND', 'REND']:
                         state_id = 9
-                        self.logger.debug("Got FEND event type: setting state_id to %s", str(state_id))
+                        self.logger.debug("Got FEND event type: setting state_id to %s, context: %s", str(state_id), context)
 
                         self.asgs_db.update_event_group(state_id, event_group_id, msg_obj)
 
                 # now insert message into the event table
-                self.asgs_db.insert_event(site_id[0], event_group_id, event_type_id, msg_obj)
+                self.asgs_db.insert_event(site_id[0], event_group_id, event_type_id, msg_obj, context)
             else:
                 err_msg = f"{context}: Error - Cannot retrieve advisory number, site, event type or state type ids."
 
@@ -156,7 +156,7 @@ class QueueCallbacks:
                 # set the return to indicate failure
                 ret_val = False
         except Exception:
-            err_msg = f"{context}: Error loading the ASGS status message."
+            err_msg = f"{context}: Error loading the ASGS status message"
 
             self.logger.exception(err_msg)
 
@@ -195,11 +195,11 @@ class QueueCallbacks:
             msg_obj: json = json.loads(body)
 
             # get the site id from the name in the message
-            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site")
+            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
 
             # insure we have a legit location
             if site_id is None or site_id[0] < 0:
-                err_msg: str = f'{context}: ERROR Unknown physical location {msg_obj.get("physical_location", "")}, Ignoring message'
+                err_msg: str = f'{context}: ERROR Unknown physical location {msg_obj.get("physical_location", "")}, Ignoring message.'
 
                 self.logger.error(err_msg)
 
@@ -209,10 +209,10 @@ class QueueCallbacks:
                 # set the return to indicate failure
                 ret_val = False
             else:
-                self.logger.debug("site_id: %s", str(site_id))
+                self.logger.debug("site_id: %s, context: %s", str(site_id), context)
 
                 # filter out handing - accept runs for all locations, except UCF and George Mason runs for now
-                site_ids = self.asgs_constants.get_site_ids()
+                site_ids = self.asgs_constants.get_site_ids(context=context)
 
                 # init the instance id
                 instance_id: int = 0
@@ -222,7 +222,7 @@ class QueueCallbacks:
                     # get the instance id
                     instance_id = self.asgs_db.get_existing_instance_id(site_id[0], msg_obj)
 
-                    self.logger.debug("instance_id: %s", str(instance_id))
+                    self.logger.debug("instance_id: %s, context: %s", str(instance_id), context)
 
                     # we must have an existing instance id
                     if instance_id > 0:
@@ -312,13 +312,13 @@ class QueueCallbacks:
             msg_obj = json.loads(body)
 
             # get the site id from the name in the message
-            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site")
+            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
 
             # get the 3vent type if from the event name in the message
-            event_type_id, event_name = self.asgs_constants.get_lu_id_from_msg(msg_obj, "event_type", "event_type")
+            event_type_id, event_name = self.asgs_constants.get_lu_id_from_msg(msg_obj, "event_type", "event_type", context=context)
 
             # get the event type if from the event name in the message
-            state_id, state_name = self.asgs_constants.get_lu_id_from_msg(msg_obj, "state", "state_type")
+            state_id, state_name = self.asgs_constants.get_lu_id_from_msg(msg_obj, "state", "state_type", context=context)
 
             # get the event advisory data
             advisory_id = msg_obj.get("advisory_number", "N/A") if (msg_obj.get("advisory_number", "N/A") != "") else "N/A"
@@ -331,20 +331,20 @@ class QueueCallbacks:
 
                 # if this is a STRT event, create a new instance
                 if instance_id < 0 or (event_name == "STRT" and state_name == "RUNN"):
-                    self.logger.debug("create_new_inst is True - creating new inst")
+                    self.logger.debug("create_new_inst is True - creating new instance id, context: %s", context)
 
                     # insert the record
-                    instance_id = self.asgs_db.insert_instance(state_id, site_id[0], msg_obj)
+                    instance_id = self.asgs_db.insert_instance(state_id, site_id[0], msg_obj, context)
 
                 else:  # just update instance
-                    self.logger.debug("create_new_inst is False - updating inst")
+                    self.logger.debug("create_new_inst is False - updating instance id, context: %s", context)
 
                     # update the instance
                     self.asgs_db.update_instance(state_id, site_id[0], instance_id, msg_obj)
 
                 # check to see if there are any event groups for this site_id and inst yet
                 # this might happen if we start up this process in the middle of a model run
-                event_group_id = self.asgs_db.get_existing_event_group_id(instance_id, advisory_id)
+                event_group_id = self.asgs_db.get_existing_event_group_id(instance_id, advisory_id, context)
 
                 # if this is the start of a group of Events, create a new event_group record
                 # qualifying group initiation: event type = RSTR
@@ -356,22 +356,22 @@ class QueueCallbacks:
                 #   after creating first one, when very first RSTR comes for this instance+++++++++++++++++++
 
                 if event_group_id < 0 or (event_name == "RSTR"):
-                    event_group_id = self.asgs_db.insert_event_group(state_id, instance_id, msg_obj)
+                    event_group_id = self.asgs_db.insert_event_group(state_id, instance_id, msg_obj, context)
                 else:
                     # don't need a new event group
-                    self.logger.debug("Reusing event_group_id: %s", event_group_id)
+                    self.logger.debug("Reusing event_group_id: %s, context: %s", event_group_id, context)
 
                     # update event group with this latest state
                     # added 3/6/19 - will set status to EXIT if this is a FEND or REND event_type
                     # will hardcode this state id for now, until I get my messaging refactor delivered
                     if event_name in ['FEND', 'REND']:
                         state_id = 9
-                        self.logger.debug("Got FEND event type: setting state_id to %s", str(state_id))
+                        self.logger.debug("Got FEND event type: setting state_id to %s, context: %s", str(state_id), context)
 
                         self.asgs_db.update_event_group(state_id, event_group_id, msg_obj)
 
                 # now insert message into the event table
-                self.asgs_db.insert_event(site_id[0], event_group_id, event_type_id, msg_obj)
+                self.asgs_db.insert_event(site_id[0], event_group_id, event_type_id, msg_obj, context)
             else:
                 err_msg = f"{context}: Error - Cannot retrieve advisory number, site, event type or state type ids."
 
@@ -434,7 +434,7 @@ class QueueCallbacks:
             msg_obj = self.queue_utils.transform_msg_to_asgs_legacy(msg_obj)
 
             # get the site id from the name in the message
-            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site")
+            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
 
             # insure we have a legit location
             if site_id is None or site_id[0] < 0:
@@ -450,10 +450,10 @@ class QueueCallbacks:
                 # set the failure flag
                 ret_val = False
             else:
-                self.logger.debug("site_id: %s", str(site_id))
+                self.logger.debug("site_id: %s, context: %s", str(site_id), context)
 
                 # filter out handing - accept runs for all locations, except UCF and George Mason runs for now
-                site_ids = self.asgs_constants.get_site_ids()
+                site_ids = self.asgs_constants.get_site_ids(context=context)
 
                 # init the instance id
                 instance_id: int = 0
@@ -463,12 +463,12 @@ class QueueCallbacks:
                     # get the instance id
                     instance_id = self.asgs_db.get_existing_instance_id(site_id[0], msg_obj)
 
-                    self.logger.info("instance_id: %s", str(instance_id))
+                    self.logger.info("instance_id: %s, context: %s", str(instance_id), context)
 
                     # we must have an existing instance id
                     if instance_id > 0:
                         # insert the records
-                        err_msg: str = self.asgs_db.insert_ecflow_config_items(instance_id, msg_obj, 'new')
+                        err_msg: str = self.asgs_db.insert_ecflow_config_items(instance_id, msg_obj, 'new', context=context)
 
                         if err_msg is not None:
                             err_msg: str = f'{context}: Error - DB insert for run properties message failed: {err_msg}, ignoring message.'
@@ -547,7 +547,7 @@ class QueueCallbacks:
             msg_obj = self.queue_utils.transform_msg_to_asgs_legacy(msg_obj)
 
             # get the site id from the name in the message
-            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site")
+            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
 
             # insure we have a legit location
             if site_id is None or site_id[0] < 0:
@@ -563,10 +563,10 @@ class QueueCallbacks:
                 # set the failure flag
                 ret_val = False
             else:
-                self.logger.debug("site_id: %s", str(site_id))
+                self.logger.debug("site_id: %s, context: %s", str(site_id), context)
 
                 # filter out handing - accept runs for all locations, except UCF and George Mason runs for now
-                site_ids = self.asgs_constants.get_site_ids()
+                site_ids = self.asgs_constants.get_site_ids(context=context)
 
                 # init the instance id
                 instance_id: int = 0
@@ -576,7 +576,7 @@ class QueueCallbacks:
                     # get the instance id
                     instance_id = self.asgs_db.get_existing_instance_id(site_id[0], msg_obj)
 
-                    self.logger.info("instance_id: %s", str(instance_id))
+                    self.logger.debug("instance_id: %s, context: %s", str(instance_id), context)
 
                     # we must have an existing instance id
                     if instance_id > 0:
