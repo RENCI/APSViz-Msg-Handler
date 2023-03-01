@@ -463,12 +463,12 @@ class QueueCallbacks:
                     # get the instance id
                     instance_id = self.asgs_db.get_existing_instance_id(site_id[0], msg_obj)
 
-                    self.logger.info("instance_id: %s, context: %s", str(instance_id), context)
+                    self.logger.debug("instance_id: %s", str(instance_id))
 
                     # we must have an existing instance id
                     if instance_id > 0:
                         # insert the records
-                        err_msg: str = self.asgs_db.insert_ecflow_config_items(instance_id, msg_obj, 'new', context=context)
+                        err_msg: str = self.asgs_db.insert_ecflow_config_items(instance_id, msg_obj, 'new')
 
                         if err_msg is not None:
                             err_msg: str = f'{context}: Error - DB insert for run properties message failed: {err_msg}, ignoring message.'
