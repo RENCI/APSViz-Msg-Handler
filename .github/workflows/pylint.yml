@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: LicenseRef-RENCI
 # SPDX-License-Identifier: MIT
 
-name: Pylint and Pytest the codebase
+name: Pylint the codebase
 
 # trigger event is a push to the main repo branch (or a manual launch)
 on:
