@@ -1,1 +1,16 @@
-{"suite.physical_location": "RENCI","suite.project_code": "hecras_test_renci","suite.instance_name": "ec95d","suite.uid": "94836645","suite.adcirc.gridname": "ec95d","forcing.ensemblename": "gfsforecast","time.currentdate": "230206","time.currentcycle": "06","forcing.advisory": "NA","forcing.metclass": "synoptic","forcing.waves": "0","forcing.stormname": null,"output.downloadurl": "//hecrastest/max_wse.tif","forcing.vortexmodel": "NA"}
+{
+  "suite.physical_location": "RENCI",
+  "suite.project_code": "hecras_test_renci",
+  "suite.instance_name": "ec95d",
+  "suite.uid": "94836645",
+  "suite.adcirc.gridname": "ec95d",
+  "forcing.ensemblename": "gfsforecast",
+  "time.currentdate": "230206",
+  "time.currentcycle": "06",
+  "forcing.advisory": "2023030112",
+  "forcing.metclass": "synoptic",
+  "forcing.waves": "0",
+  "forcing.stormname": null,
+  "output.downloadurl": "//hecrastest/max_wse.tif",
+  "forcing.vortexmodel": "NA"
+}
