@@ -42,8 +42,8 @@ class QueueUtils:
             # create a logger
             self.logger = LoggingUtil.init_logging("APSVIZ.Msg-handler.QueueUtils", level=log_level, line_format='medium', log_file_path=log_path)
 
-        # declare the ECFlow target params to asgs keys dict
-        self.ecflow_transform_params = {'suite.physical_location': ['physical_location', 'monitoring.rmqmessaging.locationname'],
+        # declare the ECFlow and HEC/RAS target params to asgs keys mapping dict
+        self.msg_transform_params = {'suite.physical_location': ['physical_location', 'monitoring.rmqmessaging.locationname'],
                                         'suite.instance_name': ['instance_name', 'instancename'], 'suite.project_code': [], 'suite.uid': ['uid'],
                                         'suite.adcirc.gridname': ['ADCIRCgrid', 'adcirc.gridname'], 'time.currentdate': ['currentdate'],
                                         'time.currentcycle': ['currentcycle'], 'forcing.advisory': ['advisory'],
@@ -174,7 +174,7 @@ class QueueUtils:
         ret_val: dict = run_params.copy()
 
         # go through the params, search for a target, transform it into the ASGS equivalent
-        for key, values in self.ecflow_transform_params.items():
+        for key, values in self.msg_transform_params.items():
             # find this in the run params
             if key in run_params:
                 # grab the new keys from the transform asgs keys list
