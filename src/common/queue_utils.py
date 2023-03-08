@@ -44,13 +44,13 @@ class QueueUtils:
 
         # declare the ECFlow and HEC/RAS target params to asgs keys mapping dict
         self.msg_transform_params = {'suite.physical_location': ['physical_location', 'monitoring.rmqmessaging.locationname'],
-                                        'suite.instance_name': ['instance_name', 'instancename'], 'suite.project_code': [], 'suite.uid': ['uid'],
-                                        'suite.adcirc.gridname': ['ADCIRCgrid', 'adcirc.gridname'], 'time.currentdate': ['currentdate'],
-                                        'time.currentcycle': ['currentcycle'], 'forcing.advisory': ['advisory'],
-                                        'forcing.ensemblename': ['asgs.enstorm', 'enstorm'], 'forcing.metclass': [],
-                                        'forcing.stormname': ['stormname', 'forcing.tropicalcyclone.stormname'],
-                                        'forcing.waves': ['config.coupling.waves'], 'forcing.stormnumber': ['storm'],
-                                        'output.downloadurl': ['downloadurl'], 'forcing.vortexmodel': ['forcing.tropicalcyclone.vortexmodel']}
+                                     'suite.instance_name': ['instance_name', 'instancename'], 'suite.project_code': [], 'suite.uid': ['uid'],
+                                     'suite.adcirc.gridname': ['ADCIRCgrid', 'adcirc.gridname'], 'time.currentdate': ['currentdate'],
+                                     'time.currentcycle': ['currentcycle'], 'forcing.advisory': ['advisory'],
+                                     'forcing.ensemblename': ['asgs.enstorm', 'enstorm'], 'forcing.metclass': [],
+                                     'forcing.stormname': ['stormname', 'forcing.tropicalcyclone.stormname'],
+                                     'forcing.waves': ['config.coupling.waves'], 'forcing.stormnumber': ['storm'],
+                                     'output.downloadurl': ['downloadurl'], 'forcing.vortexmodel': ['forcing.tropicalcyclone.vortexmodel']}
 
         # save the queue name
         self.queue_name = _queue_name
