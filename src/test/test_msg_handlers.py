@@ -19,24 +19,24 @@ from src.common.asgs_constants import AsgsConstants
 from src.common.queue_callbacks import QueueCallbacks
 
 # these are the currently expected ecflow params that were transformed into ASGS legacy params
-ecflow_expected_transformed_params: dict = {'physical_location': 'RENCI', 'monitoring.rmqmessaging.locationname': 'RENCI',
-                                            'instance_name': 'ec95d', 'instancename': 'ec95d', 'uid': '90161888', 'ADCIRCgrid': 'ec95d',
-                                            'adcirc.gridname': 'ec95d', 'currentdate': '230206', 'currentcycle': '12', 'advisory': '2023030112',
-                                            'asgs.enstorm': 'gfsforecast', 'enstorm': 'gfsforecast', 'stormname': 'none',
-                                            'forcing.tropicalcyclone.stormname': 'none', 'config.coupling.waves': '0',
-                                            'downloadurl': 'https://apsviz-thredds-dev.apps.renci.org/thredds/fileServer/2023/gfs/2023020612/' 
-                                            'ec95d/ht-ncfs.renci.org/ec95d/gfsforecast', 'forcing.tropicalcyclone.vortexmodel': 'NA'}
+ecflow_expected_transformed_params: dict = {'physical_location': 'RENCI', 'monitoring.rmqmessaging.locationname': 'RENCI', 'instance_name': 'ec95d',
+                                            'instancename': 'ec95d', 'uid': '90161888', 'ADCIRCgrid': 'ec95d', 'adcirc.gridname': 'ec95d',
+                                            'currentdate': '230206', 'currentcycle': '12', 'advisory': '2023030112', 'asgs.enstorm': 'gfsforecast',
+                                            'enstorm': 'gfsforecast', 'stormname': 'none', 'forcing.tropicalcyclone.stormname': 'none',
+                                            'config.coupling.waves': '0',
+                                            'downloadurl': 'https://apsviz-thredds-dev.apps.renci.org/thredds/fileServer/2023/gfs/2023020612/'
+                                                           'ec95d/ht-ncfs.renci.org/ec95d/gfsforecast', 'forcing.tropicalcyclone.vortexmodel': 'NA'}
 
 # these are the currently expected hecras params that were transformed into ASGS legacy params
-hecras_expected_transformed_params: dict = {'ADCIRCgrid': 'ec95d', 'adcirc.gridname': 'ec95d', 'advisory': '2023030112', 'asgs.enstorm': 'gfsforecast',
-                                            'config.coupling.waves': '0', 'currentcycle': '06', 'currentdate': '230206',
-                                            'downloadurl': '//hecrastest/max_wse.tif', 'enstorm': 'gfsforecast', 'forcing.advisory': '2023030112',
-                                            'forcing.ensemblename': 'gfsforecast', 'forcing.metclass': 'synoptic', 'forcing.stormname': None,
-                                            'forcing.tropicalcyclone.stormname': None, 'forcing.tropicalcyclone.vortexmodel': 'NA',
-                                            'forcing.vortexmodel': 'NA', 'forcing.waves': '0', 'instance_name': 'ec95d', 'instancename': 'ec95d',
-                                            'monitoring.rmqmessaging.locationname': 'RENCI', 'output.downloadurl': '//hecrastest/max_wse.tif',
-                                            'physical_location': 'RENCI', 'stormname': None, 'suite.adcirc.gridname': 'ec95d',
-                                            'suite.instance_name': 'ec95d', 'suite.physical_location': 'RENCI',
+hecras_expected_transformed_params: dict = {'ADCIRCgrid': 'ec95d', 'adcirc.gridname': 'ec95d', 'advisory': '2023030112',
+                                            'asgs.enstorm': 'gfsforecast', 'config.coupling.waves': '0', 'currentcycle': '06',
+                                            'currentdate': '230206', 'downloadurl': '//hecrastest/max_wse.tif', 'enstorm': 'gfsforecast',
+                                            'forcing.advisory': '2023030112', 'forcing.ensemblename': 'gfsforecast', 'forcing.metclass': 'synoptic',
+                                            'forcing.stormname': None, 'forcing.tropicalcyclone.stormname': None,
+                                            'forcing.tropicalcyclone.vortexmodel': 'NA', 'forcing.vortexmodel': 'NA', 'forcing.waves': '0',
+                                            'instance_name': 'ec95d', 'instancename': 'ec95d', 'monitoring.rmqmessaging.locationname': 'RENCI',
+                                            'output.downloadurl': '//hecrastest/max_wse.tif', 'physical_location': 'RENCI', 'stormname': None,
+                                            'suite.adcirc.gridname': 'ec95d', 'suite.instance_name': 'ec95d', 'suite.physical_location': 'RENCI',
                                             'suite.project_code': 'hecras_test_renci', 'suite.uid': '94836645', 'time.currentcycle': '06',
                                             'time.currentdate': '230206', 'uid': '94836645'}
 
