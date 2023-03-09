@@ -13,7 +13,7 @@
 import json
 
 from src.common.logger import LoggingUtil
-from src.common.asgs_db import AsgsDb
+from src.common.pg_impl import PGImplementation
 from src.common.general_utils import GeneralUtils
 from src.common.queue_utils import QueueUtils
 from src.common.asgs_constants import AsgsConstants
@@ -48,8 +48,12 @@ class QueueCallbacks:
         # define and init the object used to handle ASGS constant conversions
         self.asgs_constants = AsgsConstants(_logger=self.logger)
 
+        # specify the DB to get a connection
+        # note the extra comma makes this single item a singleton tuple
+        db_name: tuple = ('asgs',)
+
         # define and init the object that will handle ASGS DB operations
-        self.asgs_db = AsgsDb(self.asgs_constants, _logger=self.logger)
+        self.db_info: PGImplementation = PGImplementation(db_name)
 
         # define and init the object used to handle ASGS constant conversions
         self.queue_utils = QueueUtils(_queue_name=_queue_name, _logger=self.logger)
@@ -100,24 +104,24 @@ class QueueCallbacks:
             if site_id[0] >= 0 and event_type_id >= 0 and state_id >= 0 and advisory_id != 'N/A':
                 # check to see if there are any instances for this site_id yet
                 # this might happen if we start up this process in the middle of a model run
-                instance_id = self.asgs_db.get_existing_instance_id(site_id[0], msg_obj)
+                instance_id = self.db_info.get_existing_instance_id(site_id[0], msg_obj)
 
                 # if this is a STRT event, create a new instance
                 if instance_id < 0 or (event_name == "STRT" and state_name == "RUNN"):
                     self.logger.debug("create_new_inst is True - creating new inst. context: %s", context)
 
                     # insert the record
-                    instance_id = self.asgs_db.insert_instance(state_id, site_id[0], msg_obj, context)
+                    instance_id = self.db_info.insert_instance(state_id, site_id[0], msg_obj, context)
 
                 else:  # just update instance
                     self.logger.debug("create_new_inst is False - updating instance id. context: %s", context)
 
                     # update the instance
-                    self.asgs_db.update_instance(state_id, site_id[0], instance_id, msg_obj)
+                    self.db_info.update_instance(state_id, site_id[0], instance_id, msg_obj)
 
                 # check to see if there are any event groups for this site_id and inst yet
                 # this might happen if we start up this process in the middle of a model run
-                event_group_id = self.asgs_db.get_existing_event_group_id(instance_id, advisory_id, context)
+                event_group_id = self.db_info.get_existing_event_group_id(instance_id, advisory_id, context)
 
                 # if this is the start of a group of Events, create a new event_group record
                 # qualifying group initiation: event type = RSTR
@@ -129,7 +133,7 @@ class QueueCallbacks:
                 #   after creating first one, when very first RSTR comes for this instance+++++++++++++++++++
 
                 if event_group_id < 0 or (event_name == "RSTR"):
-                    event_group_id = self.asgs_db.insert_event_group(state_id, instance_id, msg_obj, context)
+                    event_group_id = self.db_info.insert_event_group(state_id, instance_id, msg_obj, context)
                 else:
                     # don't need a new event group
                     self.logger.debug("Reusing event_group_id: %s, context: %s", event_group_id, context)
@@ -141,10 +145,10 @@ class QueueCallbacks:
                         state_id = 9
                         self.logger.debug("Got FEND event type: setting state_id to %s, context: %s", str(state_id), context)
 
-                        self.asgs_db.update_event_group(state_id, event_group_id, msg_obj)
+                        self.db_info.update_event_group(state_id, event_group_id, msg_obj)
 
                 # now insert message into the event table
-                self.asgs_db.insert_event(site_id[0], event_group_id, event_type_id, msg_obj, context)
+                self.db_info.insert_event(site_id[0], event_group_id, event_type_id, msg_obj, context)
             else:
                 err_msg = f"{context}: Error - Cannot retrieve advisory number, site, event type or state type ids."
 
@@ -220,7 +224,7 @@ class QueueCallbacks:
                 # check the site id
                 if site_id[0] in site_ids:
                     # get the instance id
-                    instance_id = self.asgs_db.get_existing_instance_id(site_id[0], msg_obj)
+                    instance_id = self.db_info.get_existing_instance_id(site_id[0], msg_obj)
 
                     self.logger.debug("instance_id: %s, context: %s", str(instance_id), context)
 
@@ -231,7 +235,7 @@ class QueueCallbacks:
 
                         if param_list is not None:
                             # insert the records
-                            err_msg: str = self.asgs_db.insert_asgs_config_items(instance_id, param_list)
+                            err_msg: str = self.db_info.insert_asgs_config_items(instance_id, param_list)
 
                             if err_msg is not None:
                                 err_msg: str = f'{context}: Error - DB insert for run properties message failed: {err_msg}, ignoring message.'
@@ -327,24 +331,24 @@ class QueueCallbacks:
             if site_id[0] >= 0 and event_type_id >= 0 and state_id >= 0 and advisory_id != 'N/A':
                 # check to see if there are any instances for this site_id yet
                 # this might happen if we start up this process in the middle of a model run
-                instance_id = self.asgs_db.get_existing_instance_id(site_id[0], msg_obj)
+                instance_id = self.db_info.get_existing_instance_id(site_id[0], msg_obj)
 
                 # if this is a STRT event, create a new instance
                 if instance_id < 0 or (event_name == "STRT" and state_name == "RUNN"):
                     self.logger.debug("create_new_inst is True - creating new instance id, context: %s", context)
 
                     # insert the record
-                    instance_id = self.asgs_db.insert_instance(state_id, site_id[0], msg_obj, context)
+                    instance_id = self.db_info.insert_instance(state_id, site_id[0], msg_obj, context)
 
                 else:  # just update instance
                     self.logger.debug("create_new_inst is False - updating instance id, context: %s", context)
 
                     # update the instance
-                    self.asgs_db.update_instance(state_id, site_id[0], instance_id, msg_obj)
+                    self.db_info.update_instance(state_id, site_id[0], instance_id, msg_obj)
 
                 # check to see if there are any event groups for this site_id and inst yet
                 # this might happen if we start up this process in the middle of a model run
-                event_group_id = self.asgs_db.get_existing_event_group_id(instance_id, advisory_id, context)
+                event_group_id = self.db_info.get_existing_event_group_id(instance_id, advisory_id, context)
 
                 # if this is the start of a group of Events, create a new event_group record
                 # qualifying group initiation: event type = RSTR
@@ -356,7 +360,7 @@ class QueueCallbacks:
                 #   after creating first one, when very first RSTR comes for this instance+++++++++++++++++++
 
                 if event_group_id < 0 or (event_name == "RSTR"):
-                    event_group_id = self.asgs_db.insert_event_group(state_id, instance_id, msg_obj, context)
+                    event_group_id = self.db_info.insert_event_group(state_id, instance_id, msg_obj, context)
                 else:
                     # don't need a new event group
                     self.logger.debug("Reusing event_group_id: %s, context: %s", event_group_id, context)
@@ -368,10 +372,10 @@ class QueueCallbacks:
                         state_id = 9
                         self.logger.debug("Got FEND event type: setting state_id to %s, context: %s", str(state_id), context)
 
-                        self.asgs_db.update_event_group(state_id, event_group_id, msg_obj)
+                        self.db_info.update_event_group(state_id, event_group_id, msg_obj)
 
                 # now insert message into the event table
-                self.asgs_db.insert_event(site_id[0], event_group_id, event_type_id, msg_obj, context)
+                self.db_info.insert_event(site_id[0], event_group_id, event_type_id, msg_obj, context)
             else:
                 err_msg = f"{context}: Error - Cannot retrieve advisory number, site, event type or state type ids."
 
@@ -461,14 +465,14 @@ class QueueCallbacks:
                 # check the site id
                 if site_id[0] in site_ids:
                     # get the instance id
-                    instance_id = self.asgs_db.get_existing_instance_id(site_id[0], msg_obj)
+                    instance_id = self.db_info.get_existing_instance_id(site_id[0], msg_obj)
 
                     self.logger.debug("instance_id: %s", str(instance_id))
 
                     # we must have an existing instance id
                     if instance_id > 0:
                         # insert the records
-                        err_msg: str = self.asgs_db.insert_ecflow_config_items(instance_id, msg_obj, 'new')
+                        err_msg: str = self.db_info.insert_ecflow_config_items(instance_id, msg_obj, 'new')
 
                         if err_msg is not None:
                             err_msg: str = f'{context}: Error - DB insert for run properties message failed: {err_msg}, ignoring message.'
@@ -574,14 +578,14 @@ class QueueCallbacks:
                 # check the site id
                 if site_id[0] in site_ids:
                     # get the instance id
-                    instance_id = self.asgs_db.get_existing_instance_id(site_id[0], msg_obj)
+                    instance_id = self.db_info.get_existing_instance_id(site_id[0], msg_obj)
 
                     self.logger.debug("instance_id: %s, context: %s", str(instance_id), context)
 
                     # we must have an existing instance id
                     if instance_id > 0:
                         # insert the records
-                        err_msg: str = self.asgs_db.insert_hecras_config_items(instance_id, msg_obj, 'new')
+                        err_msg: str = self.db_info.insert_hecras_config_items(instance_id, msg_obj, 'new')
 
                         # was there a problem
                         if err_msg is not None:

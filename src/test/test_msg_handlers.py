@@ -14,7 +14,7 @@ import os
 import json
 
 from src.common.queue_utils import QueueUtils
-from src.common.asgs_db import AsgsDb
+from src.common.pg_impl import PGImplementation
 from src.common.asgs_constants import AsgsConstants
 from src.common.queue_callbacks import QueueCallbacks
 
@@ -48,13 +48,17 @@ def test_insert_ecflow_config_items():
     :return:
     """
     # define and init the object used to handle ASGS constant conversions
-    asgs_constants = AsgsConstants(_logger=None)
+    asgs_constants = AsgsConstants()
+
+    # specify the DB to get a connection
+    # note the extra comma makes this single item a singleton tuple
+    db_name: tuple = ('asgs',)
 
     # define and init the object that will handle ASGS DB operations
-    asgs_db = AsgsDb(asgs_constants, _logger=None)
+    db_info = PGImplementation(db_name)
 
     # instantiate the utility class
-    queue_utils = QueueUtils(_queue_name='', _logger=None)
+    queue_utils = QueueUtils(_queue_name='')
 
     # load the json
     with open(os.path.join(os.path.dirname(__file__), 'test_ecflow_run_props.json'), encoding='UTF-8') as test_fh:
@@ -76,10 +80,10 @@ def test_insert_ecflow_config_items():
     site_id = asgs_constants.get_lu_id(run_props.get('suite.physical_location'), 'site', context='test_insert_ecflow_config_items()')
 
     # insert an instance record into the DB to get things primed
-    instance_id = asgs_db.insert_instance(state_id, site_id, run_props, context='test_insert_ecflow_config_items()')
+    instance_id = db_info.insert_instance(state_id, site_id, run_props, context='test_insert_ecflow_config_items()')
 
     # insert the run params into the DB
-    ret_val = asgs_db.insert_ecflow_config_items(instance_id, run_props, 'debug')
+    ret_val = db_info.insert_ecflow_config_items(instance_id, run_props, 'debug')
 
     # test the result, empty str == success
     assert ret_val is None
@@ -96,7 +100,7 @@ def test_ecflow_queue_callback():
         msg = test_fh.readline()
 
     # instantiate the utility class
-    queue_callback = QueueCallbacks(_queue_name='', _logger=None)
+    queue_callback = QueueCallbacks(_queue_name='')
 
     # call the msg handler callback
     success = queue_callback.ecflow_run_time_status_callback(None, None, None, msg)
@@ -112,13 +116,17 @@ def test_insert_hecras_config_items():
     :return:
     """
     # define and init the object used to handle ASGS constant conversions
-    asgs_constants = AsgsConstants(_logger=None)
+    asgs_constants = AsgsConstants()
+
+    # specify the DB to get a connection
+    # note the extra comma makes this single item a singleton tuple
+    db_name: tuple = ('asgs',)
 
     # define and init the object that will handle ASGS DB operations
-    asgs_db = AsgsDb(asgs_constants, _logger=None)
+    db_info = PGImplementation(db_name)
 
     # instantiate the utility class
-    queue_utils = QueueUtils(_queue_name='', _logger=None)
+    queue_utils = QueueUtils(_queue_name='')
 
     # load the json
     with open(os.path.join(os.path.dirname(__file__), 'test_hecras_run_props.json'), encoding='UTF-8') as test_fh:
@@ -140,10 +148,10 @@ def test_insert_hecras_config_items():
     site_id = asgs_constants.get_lu_id(run_props.get('suite.physical_location'), 'site', context='test_insert_hecras_config_items()')
 
     # insert an instance record into the DB to get things primed
-    instance_id = asgs_db.insert_instance(state_id, site_id, run_props, context='test_insert_hecras_config_items()')
+    instance_id = db_info.insert_instance(state_id, site_id, run_props, context='test_insert_hecras_config_items()')
 
     # insert the run params into the DB
-    ret_val = asgs_db.insert_hecras_config_items(instance_id, run_props, 'debug')
+    ret_val = db_info.insert_hecras_config_items(instance_id, run_props, 'debug')
 
     # test the result, empty str == success
     assert ret_val is None
@@ -160,7 +168,7 @@ def test_hecras_queue_callback():
         msg = test_fh.readline()
 
     # instantiate the utility class
-    queue_callback = QueueCallbacks(_queue_name='', _logger=None)
+    queue_callback = QueueCallbacks(_queue_name='')
 
     # call the msg handler callback
     success = queue_callback.hecras_run_props_callback(None, None, None, msg)
