@@ -64,7 +64,7 @@ class PGImplementation(PGUtilsMultiConnect):
 
         group = self.exec_sql('asgs', sql_stmt)
 
-        if group is not None:
+        if group > 0:
             existing_group_id = group
         else:
             existing_group_id = -1
@@ -99,7 +99,7 @@ class PGImplementation(PGUtilsMultiConnect):
 
         inst = self.exec_sql('asgs', sql_stmt)
 
-        if inst is not None:
+        if inst > 0:
             existing_instance_id = inst
         else:
             existing_instance_id = -1
@@ -271,10 +271,12 @@ class PGImplementation(PGUtilsMultiConnect):
                    f"final_product) VALUES ({state_id}, {instance_id}, '{event_group_ts}', '{storm_name}', '{storm_number}', '{advisory_id}'" \
                    f", 'product') RETURNING id"
 
+        # get the new event group id
         group = self.exec_sql('asgs', sql_stmt)
 
         self.logger.debug("group: %s, context: %s", group, context)
 
+        # return the new event group id
         return group
 
     def insert_instance(self, state_id, site_id, msg_obj, context: str = 'unknown'):
@@ -311,6 +313,7 @@ class PGImplementation(PGUtilsMultiConnect):
         sql_stmt = f"INSERT INTO \"ASGS_Mon_instance\" (site_id, process_id, start_ts, end_ts, run_params, instance_name, inst_state_type_id) " \
                    f"VALUES ({site_id}, {process_id}, '{start_ts}', '{end_ts}', '{run_params}', '{instance_name}', {state_id}) RETURNING id"
 
+        # insert the record and the new instance id
         instance_id = self.exec_sql('asgs', sql_stmt)
 
         self.logger.debug("instance_id: %s, context: %s", instance_id, context)
