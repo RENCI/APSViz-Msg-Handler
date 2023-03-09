@@ -40,7 +40,7 @@ class QueueUtils:
             log_level, log_path = LoggingUtil.prep_for_logging()
 
             # create a logger
-            self.logger = LoggingUtil.init_logging("APSVIZ.Msg-handler.QueueUtils", level=log_level, line_format='medium', log_file_path=log_path)
+            self.logger = LoggingUtil.init_logging("APSVIZ.Msg-Handler.QueueUtils", level=log_level, line_format='medium', log_file_path=log_path)
 
         # declare the ECFlow and HEC/RAS target params to asgs keys mapping dict
         self.msg_transform_params = {'suite.physical_location': ['physical_location', 'monitoring.rmqmessaging.locationname'],
