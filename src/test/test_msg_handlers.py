@@ -96,7 +96,7 @@ def test_ecflow_queue_callback():
     :return:
     """
     # load the json
-    with open(os.path.join(os.path.dirname(__file__), 'test_ecflow_run_time.json'), encoding='UTF-8') as test_fh:
+    with open(os.path.join(os.path.dirname(__file__), 'test_new_run_time_msg.json'), encoding='UTF-8') as test_fh:
         msg = test_fh.readline()
 
     # instantiate the utility class
