@@ -119,36 +119,48 @@ class QueueCallbacks:
                     # update the instance
                     self.db_info.update_instance(state_id, site_id[0], instance_id, msg_obj)
 
-                # check to see if there are any event groups for this site_id and inst yet
-                # this might happen if we start up this process in the middle of a model run
-                event_group_id = self.db_info.get_existing_event_group_id(instance_id, advisory_id, context)
+                # if we dont have an instance id at this point we cant continue
+                if instance_id < 0:
+                    err_msg = f"{context}: Error - Cannot obtain a valid instance ID."
 
-                # if this is the start of a group of Events, create a new event_group record
-                # qualifying group initiation: event type = RSTR
-                # STRT & HIND do not belong to any event group??
-                # For now, it is required that every event belong to an event group, so I will add those as well.
-                # create a new event group if none exist for this site & instance yet or if starting a new cycle
+                    self.logger.error(err_msg)
 
-                # +++++++++++++++++++++++++ Figure out how to stop creating a second event group
-                #   after creating first one, when very first RSTR comes for this instance+++++++++++++++++++
+                    # send a message to slack
+                    self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
 
-                if event_group_id < 0 or (event_name == "RSTR"):
-                    event_group_id = self.db_info.insert_event_group(state_id, instance_id, msg_obj, context)
+                    # set the return to indicate failure
+                    ret_val = False
                 else:
-                    # don't need a new event group
-                    self.logger.debug("Reusing event_group_id: %s, context: %s", event_group_id, context)
+                    # check to see if there are any event groups for this site_id and inst yet
+                    # this might happen if we start up this process in the middle of a model run
+                    event_group_id = self.db_info.get_existing_event_group_id(instance_id, advisory_id, context)
 
-                    # update event group with this latest state
-                    # added 3/6/19 - will set status to EXIT if this is a FEND or REND event_type
-                    # will hardcode this state id for now, until I get my messaging refactor delivered
-                    if event_name in ['FEND', 'REND']:
-                        state_id = 9
-                        self.logger.debug("Got FEND event type: setting state_id to %s, context: %s", str(state_id), context)
+                    # if this is the start of a group of Events, create a new event_group record
+                    # qualifying group initiation: event type = RSTR
+                    # STRT & HIND do not belong to any event group??
+                    # For now, it is required that every event belong to an event group, so I will add those as well.
+                    # create a new event group if none exist for this site & instance yet or if starting a new cycle
 
-                        self.db_info.update_event_group(state_id, event_group_id, msg_obj)
+                    # +++++++++++++++++++++++++ Figure out how to stop creating a second event group
+                    #   after creating first one, when very first RSTR comes for this instance+++++++++++++++++++
 
-                # now insert message into the event table
-                self.db_info.insert_event(site_id[0], event_group_id, event_type_id, msg_obj, context)
+                    if event_group_id < 0 or (event_name == "RSTR"):
+                        event_group_id = self.db_info.insert_event_group(state_id, instance_id, msg_obj, context)
+                    else:
+                        # don't need a new event group
+                        self.logger.debug("Reusing event_group_id: %s, context: %s", event_group_id, context)
+
+                        # update event group with this latest state
+                        # added 3/6/19 - will set status to EXIT if this is a FEND or REND event_type
+                        # will hardcode this state id for now, until I get my messaging refactor delivered
+                        if event_name in ['FEND', 'REND']:
+                            state_id = 9
+                            self.logger.debug("Got FEND event type: setting state_id to %s, context: %s", str(state_id), context)
+
+                            self.db_info.update_event_group(state_id, event_group_id, msg_obj)
+
+                    # now insert message into the event table
+                    self.db_info.insert_event(site_id[0], event_group_id, event_type_id, msg_obj, context)
             else:
                 err_msg = f"{context}: Error - Cannot retrieve advisory number, site, event type or state type ids."
 
@@ -159,6 +171,7 @@ class QueueCallbacks:
 
                 # set the return to indicate failure
                 ret_val = False
+
         except Exception:
             err_msg = f"{context}: Error loading the ASGS status message"
 
@@ -346,36 +359,48 @@ class QueueCallbacks:
                     # update the instance
                     self.db_info.update_instance(state_id, site_id[0], instance_id, msg_obj)
 
-                # check to see if there are any event groups for this site_id and inst yet
-                # this might happen if we start up this process in the middle of a model run
-                event_group_id = self.db_info.get_existing_event_group_id(instance_id, advisory_id, context)
+                # if we dont have an instance id at this point we cant continue
+                if instance_id < 0:
+                    err_msg = f"{context}: Error - Cannot obtain a valid instance ID."
 
-                # if this is the start of a group of Events, create a new event_group record
-                # qualifying group initiation: event type = RSTR
-                # STRT & HIND do not belong to any event group??
-                # For now, it is required that every event belong to an event group, so I will add those as well.
-                # create a new event group if none exist for this site & instance yet or if starting a new cycle
+                    self.logger.error(err_msg)
 
-                # +++++++++++++++++++++++++ Figure out how to stop creating a second event group
-                #   after creating first one, when very first RSTR comes for this instance+++++++++++++++++++
+                    # send a message to slack
+                    self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
 
-                if event_group_id < 0 or (event_name == "RSTR"):
-                    event_group_id = self.db_info.insert_event_group(state_id, instance_id, msg_obj, context)
+                    # set the return to indicate failure
+                    ret_val = False
                 else:
-                    # don't need a new event group
-                    self.logger.debug("Reusing event_group_id: %s, context: %s", event_group_id, context)
+                    # check to see if there are any event groups for this site_id and inst yet
+                    # this might happen if we start up this process in the middle of a model run
+                    event_group_id = self.db_info.get_existing_event_group_id(instance_id, advisory_id, context)
 
-                    # update event group with this latest state
-                    # added 3/6/19 - will set status to EXIT if this is a FEND or REND event_type
-                    # will hardcode this state id for now, until I get my messaging refactor delivered
-                    if event_name in ['FEND', 'REND']:
-                        state_id = 9
-                        self.logger.debug("Got FEND event type: setting state_id to %s, context: %s", str(state_id), context)
+                    # if this is the start of a group of Events, create a new event_group record
+                    # qualifying group initiation: event type = RSTR
+                    # STRT & HIND do not belong to any event group??
+                    # For now, it is required that every event belong to an event group, so I will add those as well.
+                    # create a new event group if none exist for this site & instance yet or if starting a new cycle
 
-                        self.db_info.update_event_group(state_id, event_group_id, msg_obj)
+                    # +++++++++++++++++++++++++ Figure out how to stop creating a second event group
+                    #   after creating first one, when very first RSTR comes for this instance+++++++++++++++++++
 
-                # now insert message into the event table
-                self.db_info.insert_event(site_id[0], event_group_id, event_type_id, msg_obj, context)
+                    if event_group_id < 0 or (event_name == "RSTR"):
+                        event_group_id = self.db_info.insert_event_group(state_id, instance_id, msg_obj, context)
+                    else:
+                        # don't need a new event group
+                        self.logger.debug("Reusing event_group_id: %s, context: %s", event_group_id, context)
+
+                        # update event group with this latest state
+                        # added 3/6/19 - will set status to EXIT if this is a FEND or REND event_type
+                        # will hardcode this state id for now, until I get my messaging refactor delivered
+                        if event_name in ['FEND', 'REND']:
+                            state_id = 9
+                            self.logger.debug("Got FEND event type: setting state_id to %s, context: %s", str(state_id), context)
+
+                            self.db_info.update_event_group(state_id, event_group_id, msg_obj)
+
+                    # now insert message into the event table
+                    self.db_info.insert_event(site_id[0], event_group_id, event_type_id, msg_obj, context)
             else:
                 err_msg = f"{context}: Error - Cannot retrieve advisory number, site, event type or state type ids."
 
