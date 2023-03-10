@@ -89,7 +89,7 @@ def test_insert_ecflow_config_items():
     assert ret_val is None
 
 
-def test_ecflow_queue_callback():
+def test_ecflow_run_time_queue_callback():
     """
     Tests the handling of a ecflow run time msg
 
@@ -104,6 +104,26 @@ def test_ecflow_queue_callback():
 
     # call the msg handler callback
     success = queue_callback.ecflow_run_time_status_callback(None, None, None, msg)
+
+    # check for pass/fail
+    assert success is True
+
+
+def test_ecflow_run_props_queue_callback():
+    """
+    Tests the handling of a ecflow run time msg
+
+    :return:
+    """
+    # load the json
+    with open(os.path.join(os.path.dirname(__file__), 'test_new_run_props_msg.json'), encoding='UTF-8') as test_fh:
+        msg = test_fh.readline()
+
+    # instantiate the utility class
+    queue_callback = QueueCallbacks(_queue_name='')
+
+    # call the msg handler callback
+    success = queue_callback.ecflow_run_props_callback(None, None, None, msg)
 
     # check for pass/fail
     assert success is True
