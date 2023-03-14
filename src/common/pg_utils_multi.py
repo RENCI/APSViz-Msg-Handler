@@ -231,7 +231,7 @@ class PGUtilsMultiConnect:
                 ret_val = ret_val[0]
 
         except Exception:
-            self.logger.exception("Error detected executing SQL: %s.", sql_stmt)
+            self.logger.exception("Error detected for %s connection executing SQL: %s.", db_name, sql_stmt)
 
             # set the error code
             ret_val = -1
