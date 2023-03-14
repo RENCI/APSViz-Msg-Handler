@@ -149,7 +149,7 @@ class PGUtilsMultiConnect:
 
                     # is the connection ok now?
                     if good_conn:
-                        self.logger.info('DB Connection established to %s.', db_info.name)
+                        self.logger.debug('DB Connection established to %s.', db_info.name)
 
                         # return the verified db info tuple
                         return verified_tuple
