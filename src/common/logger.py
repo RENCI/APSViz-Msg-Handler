@@ -33,12 +33,8 @@ class LoggingUtil:
             return logger
 
         # define the various output formats
-        format_type = {
-            "minimum": '%(message)s',
-            "short": '%(funcName)s(): %(message)s',
-            "medium": '%(asctime)-15s - %(funcName)s(): %(message)s',
-            "long": '%(asctime)-15s  - %(filename)s %(funcName)s() %(levelname)s: %(message)s'
-        }[line_format]
+        format_type = {"minimum": '%(message)s', "short": '%(funcName)s(): %(message)s', "medium": '%(asctime)-15s - %(funcName)s(): %(message)s',
+                       "long": '%(asctime)-15s  - %(filename)s %(funcName)s() %(levelname)s: %(message)s'}[line_format]
 
         # create a stream handler (default to console)
         stream_handler = logging.StreamHandler()
@@ -54,6 +50,9 @@ class LoggingUtil:
 
         # set the logging level
         logger.setLevel(level)
+
+        # dont allow message propagation
+        logger.propagate = False
 
         # if there was a file path passed in use it
         if log_file_path is not None:
