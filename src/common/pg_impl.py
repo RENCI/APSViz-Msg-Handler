@@ -25,18 +25,24 @@ class PGImplementation(PGUtilsMultiConnect):
         which has all the connection and cursor handling.
     """
 
-    def __init__(self, db_names: tuple):
-        # get the log level and directory from the environment.
-        log_level, log_path = LoggingUtil.prep_for_logging()
+    def __init__(self, db_names: tuple, _logger=None, _auto_commit=True):
+        # if a reference to a logger passed in use it
+        if _logger is not None:
+            # get a handle to a logger
+            self.logger = _logger
+        else:
+            # get the log level and directory from the environment.
+            log_level, log_path = LoggingUtil.prep_for_logging()
 
-        # create a logger
-        self.logger = LoggingUtil.init_logging("APSVIZ.Msg-Handler.PGImplementation", level=log_level, line_format='medium', log_file_path=log_path)
-
-        # init the base class
-        PGUtilsMultiConnect.__init__(self, 'APSVIZ.Msg-Handler', db_names)
+            # create a logger
+            self.logger = LoggingUtil.init_logging("APSViz.Msg_Handler.PGImplementation", level=log_level, line_format='medium',
+                                                   log_file_path=log_path)
 
         # get the ASGS constants
         self.asgs_constants = AsgsConstants(_logger=self.logger)
+
+        # init the base class
+        PGUtilsMultiConnect.__init__(self, 'APSViz.Settings', db_names, _logger=self.logger, _auto_commit=_auto_commit)
 
     def __del__(self):
         """
