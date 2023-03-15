@@ -8,3 +8,4 @@
 /logs/
 /logging.conf
 /logging.conf.template
+/src/test/.pytest_cache/
