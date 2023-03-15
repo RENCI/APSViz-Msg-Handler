@@ -360,7 +360,7 @@ class QueueCallbacks:
                     # update the instance
                     self.db_info.update_instance(state_id, site_id[0], instance_id, msg_obj)
 
-                # if we dont have an instance id at this point we cant continue
+                # if we don't have an instance id at this point we cant continue
                 if instance_id < 0:
                     err_msg = f"{context}: Error - Cannot obtain a valid instance ID."
 
