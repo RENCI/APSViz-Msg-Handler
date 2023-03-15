@@ -53,7 +53,7 @@ class QueueCallbacks:
         self.db_names: tuple = ('asgs',)
 
         # define and init the object that will handle ASGS DB operations
-        self.db_info: PGImplementation = PGImplementation(self.db_names)
+        self.db_info: PGImplementation = PGImplementation(self.db_names, _logger=self.logger)
 
         # define and init the object used to handle ASGS constant conversions
         self.queue_utils = QueueUtils(_queue_name=_queue_name, _logger=self.logger)
