@@ -5,7 +5,4 @@
 # SPDX-License-Identifier: LicenseRef-RENCI
 # SPDX-License-Identifier: MIT
 
-/logs/
-/logging.conf
-/logging.conf.template
 /src/test/.pytest_cache/
