@@ -89,10 +89,10 @@ class PGImplementation(PGUtilsMultiConnect):
         """
         self.logger.debug("site_id: %s", site_id)
 
-        # get the instance name
+        # get the instance name from the message
         instance_name = msg_obj.get("instance_name", "N/A") if (msg_obj.get("instance_name", "N/A") != "") else "N/A"
 
-        # get the process id
+        # get the process id from the message
         process_id = int(msg_obj.get("uid", "0")) if (msg_obj.get("uid", "0") != "") else 0
 
         # see if there are any instances yet that have this site_id and instance_name
@@ -103,11 +103,18 @@ class PGImplementation(PGUtilsMultiConnect):
         # +++++++++++++++FIX THIS++++++++++++++++++++Add query to get correct stat id for Defunct++++++++++++++++++++++++
         # +++++++++++++++FIX THIS++++++++++++++++++++Add day to query too? (to account for rollover of process ids)++++++++++++++++++++++++
 
+        # get the instance id if it exists
         inst = self.exec_sql('asgs', sql_stmt)
 
+        # any int > 0 is a valid instance id
         if inst > 0:
+            # save the existing instance ID
             existing_instance_id = inst
         else:
+            self.logger.warning('Warning - Could not find Instance ID. Site id: %S, Process id: %s, Instance name: %s', site_id, process_id,
+                                instance_name)
+
+            # set the error code
             existing_instance_id = -1
 
         self.logger.debug("existing_instance_id: %s", existing_instance_id)
