@@ -87,6 +87,7 @@ class PGImplementation(PGUtilsMultiConnect):
         :param msg_obj:
         :return:
         """
+
         self.logger.debug("site_id: %s", site_id)
 
         # get the instance name from the message
