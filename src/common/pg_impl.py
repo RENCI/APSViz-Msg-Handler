@@ -112,7 +112,7 @@ class PGImplementation(PGUtilsMultiConnect):
             # save the existing instance ID
             existing_instance_id = inst
         else:
-            self.logger.warning('Warning - Could not find Instance ID. Site id: %S, Process id: %s, Instance name: %s', site_id, process_id,
+            self.logger.warning('Warning - Could not find Instance ID. Site id: %s, Process id: %s, Instance name: %s', site_id, process_id,
                                 instance_name)
 
             # set the error code
