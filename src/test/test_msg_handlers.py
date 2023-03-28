@@ -30,15 +30,51 @@ ecflow_expected_transformed_params: dict = {'physical_location': 'RENCI', 'monit
 # these are the currently expected hecras params that were transformed into ASGS legacy params
 hecras_expected_transformed_params: dict = {'ADCIRCgrid': 'ec95d', 'adcirc.gridname': 'ec95d', 'advisory': '2023030112',
                                             'asgs.enstorm': 'gfsforecast', 'config.coupling.waves': '0', 'currentcycle': '06',
-                                            'currentdate': '230206', 'downloadurl': '//hecrastest/max_wse.tif', 'enstorm': 'gfsforecast',
-                                            'forcing.advisory': '2023030112', 'forcing.ensemblename': 'gfsforecast', 'forcing.metclass': 'synoptic',
-                                            'forcing.stormname': None, 'forcing.tropicalcyclone.stormname': None,
+                                            'currentdate': '230206', 'downloadurl': 'http://hecrastest.com/max_wse.tif',
+                                            'enstorm': 'gfsforecast', 'forcing.advisory': '2023030112', 'forcing.ensemblename': 'gfsforecast',
+                                            'forcing.metclass': 'synoptic', 'forcing.stormname': None, 'forcing.tropicalcyclone.stormname': None,
                                             'forcing.tropicalcyclone.vortexmodel': 'NA', 'forcing.vortexmodel': 'NA', 'forcing.waves': '0',
                                             'instance_name': 'ec95d', 'instancename': 'ec95d', 'monitoring.rmqmessaging.locationname': 'RENCI',
-                                            'output.downloadurl': '//hecrastest/max_wse.tif', 'physical_location': 'RENCI', 'stormname': None,
-                                            'suite.adcirc.gridname': 'ec95d', 'suite.instance_name': 'ec95d', 'suite.physical_location': 'RENCI',
-                                            'suite.project_code': 'hecras_test_renci', 'suite.uid': '94836645', 'time.currentcycle': '06',
-                                            'time.currentdate': '230206', 'uid': '94836645'}
+                                            'output.downloadurl': 'http://hecrastest.com/max_wse.tif', 'physical_location': 'RENCI',
+                                            'stormname': None, 'suite.adcirc.gridname': 'ec95d', 'suite.instance_name': 'ec95d',
+                                            'suite.physical_location': 'RENCI', 'suite.project_code': 'hecras_test_renci', 'suite.uid': '94836645',
+                                            'time.currentcycle': '06', 'time.currentdate': '230206', 'uid': '94836645'}
+
+
+def test_insert_asgs_status_msg():
+    """
+    Tests the parsing of asgs data and insertion into the DB
+
+    :return:
+    """
+    # define and init the object used to handle ASGS constant conversions
+    asgs_constants = AsgsConstants()
+
+    # specify the DB to get a connection
+    # note the extra comma makes this single item a singleton tuple
+    db_name: tuple = ('asgs',)
+
+    # define and init the object that will handle ASGS DB operations
+    db_info = PGImplementation(db_name)
+
+    # instantiate the utility class
+    queue_utils = QueueUtils(_queue_name='')
+
+    # load the json
+    with open(os.path.join(os.path.dirname(__file__), 'test_asgs_status_msg.json'), encoding='UTF-8') as test_fh:
+        status_items = json.loads(test_fh.read())
+
+    # get the state type id. lets just set this to running for this test run
+    state_id = asgs_constants.get_lu_id('RUNN', "state_type", context='test_insert_asgs_status_msg()')
+
+    # get the site id
+    site_id = asgs_constants.get_lu_id(status_items.get('physical_location'), 'site', context='test_insert_asgs_status_msg()')
+
+    # insert an instance record into the DB to get things primed
+    instance_id = db_info.insert_instance(state_id, site_id, status_items, context='test_insert_asgs_status_msg()')
+
+    # test the result, empty str == success
+    assert instance_id >= 0
 
 
 def test_insert_ecflow_config_items():
