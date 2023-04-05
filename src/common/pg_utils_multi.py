@@ -156,7 +156,9 @@ class PGUtilsMultiConnect:
                     good_conn = self.check_db_connection(verified_tuple)
 
                     # is the connection ok now?
-                    if good_conn:
+                    if not good_conn:
+                        self.logger.warning('DB Connection not established (auto commit %s) to %s.', self.auto_commit, db_info.name)
+                    else:
                         self.logger.debug('DB Connection established (auto commit %s) to %s.', self.auto_commit, db_info.name)
 
                         # add the verified connection to the dict
@@ -164,8 +166,6 @@ class PGUtilsMultiConnect:
 
                         # no need to continue
                         break
-                    else:
-                        self.logger.warning('DB Connection not established (auto commit %s) to %s.', self.auto_commit, db_info.name)
 
             except Exception:
                 self.logger.error('Error getting connection %s.', db_info.name)
