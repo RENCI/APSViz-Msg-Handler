@@ -57,9 +57,6 @@ def test_insert_asgs_status_msg():
     # define and init the object that will handle ASGS DB operations
     db_info = PGImplementation(db_name)
 
-    # instantiate the utility class
-    queue_utils = QueueUtils(_queue_name='')
-
     # load the json
     with open(os.path.join(os.path.dirname(__file__), 'test_asgs_status_msg.json'), encoding='UTF-8') as test_fh:
         status_items = json.loads(test_fh.read())
