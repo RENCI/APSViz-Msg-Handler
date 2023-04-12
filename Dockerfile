@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: MIT
 
 # This Dockerfile is used to build THE ASGS RabbitMQ message handler python image
-FROM python:3.11.2-slim
+FROM python:3.11.3-slim
 
 # get some credit
 LABEL maintainer="powen@renci.org"
