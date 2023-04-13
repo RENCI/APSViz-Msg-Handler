@@ -243,12 +243,18 @@ class QueueCallbacks:
 
                     # we must have an existing instance id
                     if instance_id > 0:
-                        # get the configuration params
-                        param_list = msg_obj.get("param_list")
+                        # add in the high level params
+                        param_list: dict = {'physical_location': msg_obj['physical_location'], 'uid': msg_obj['uid'],
+                                            'instance_name': msg_obj['instance_name'], 'workflow_type': 'ASGS', 'supervisor_job_status': 'new',
+                                            'product_code': 'asgs'}
 
+                        # convert the asgs object into a single dict (like ecflow and hecras)
+                        param_list.update({x[0]: x[1] for x in msg_obj['param_list']})
+
+                        # was there a param list found
                         if param_list is not None:
                             # insert the records
-                            err_msg: str = self.db_info.insert_asgs_config_items(instance_id, param_list)
+                            err_msg: str = self.db_info.insert_config_items(instance_id, param_list)
 
                             # was there an error
                             if err_msg is not None:
@@ -497,8 +503,11 @@ class QueueCallbacks:
 
                     # we must have an existing instance id
                     if instance_id > 0:
+                        # add params for the workflow type and supervisor startup flag
+                        msg_obj.update({'workflow_type': 'ECFLOW', 'supervisor_job_status': 'new'})
+
                         # insert the records
-                        err_msg: str = self.db_info.insert_ecflow_config_items(instance_id, msg_obj, 'new')
+                        err_msg: str = self.db_info.insert_config_items(instance_id, msg_obj)
 
                         if err_msg is not None:
                             err_msg: str = f'{context}: Error - DB insert for run properties message failed: {err_msg}, ignoring message.'
@@ -610,8 +619,11 @@ class QueueCallbacks:
 
                     # we must have an existing instance id
                     if instance_id > 0:
+                        # add params for the workflow type and supervisor startup flag
+                        msg_obj.update({'workflow_type': 'HECRAS', 'supervisor_job_status': 'new'})
+
                         # insert the records
-                        err_msg: str = self.db_info.insert_hecras_config_items(instance_id, msg_obj, 'new')
+                        err_msg: str = self.db_info.insert_config_items(instance_id, msg_obj)
 
                         # was there a problem
                         if err_msg is not None:
@@ -626,6 +638,7 @@ class QueueCallbacks:
                     else:
                         err_msg: str = f"{context}: Error invalid instance ID. Ignoring message for HEC/RAS " \
                                        f"{msg_obj.get('physical_location', 'N/A')}."
+
                         self.logger.error(err_msg)
 
                         # send a message to slack
