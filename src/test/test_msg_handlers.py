@@ -74,6 +74,52 @@ def test_insert_asgs_status_msg():
     assert instance_id >= 0
 
 
+def test_insert_asgs_config_items():
+    """
+    Tests the parsing of hec/ras data and insertion into the DB
+
+    :return:
+    """
+    # define and init the object used to handle ASGS constant conversions
+    asgs_constants = AsgsConstants()
+
+    # specify the DB to get a connection
+    # note the extra comma makes this single item a singleton tuple
+    db_name: tuple = ('asgs',)
+
+    # define and init the object that will handle ASGS DB operations
+    db_info = PGImplementation(db_name)
+
+    # instantiate the utility class
+    queue_utils = QueueUtils(_queue_name='')
+
+    # load the json
+    with open(os.path.join(os.path.dirname(__file__), 'test_asgs_run_props.json'), encoding='UTF-8') as test_fh:
+        run_props = json.loads(test_fh.read())
+
+    # get the param array into a dict
+    param_list: dict = {'physical_location': run_props['physical_location'], 'uid': run_props['uid'], 'instance_name': run_props['instance_name'],
+                        'workflow_type': 'ASGS', 'supervisor_job_status': 'debug', 'product_type': 'asgs'}
+
+    # convert the asgs object into a single dict (like ecflow and hecras)
+    param_list.update({x[0]: x[1] for x in run_props['param_list']})
+
+    # get the state type id. lets just set this to running for this test run
+    state_id = asgs_constants.get_lu_id('RUNN', "state_type", context='test_insert_asgs_config_items()')
+
+    # get the site id
+    site_id = asgs_constants.get_lu_id(param_list.get('physical_location'), 'site', context='test_insert_asgs_config_items()')
+
+    # insert an instance record into the DB to get things primed
+    instance_id = db_info.insert_instance(state_id, site_id, param_list, context='test_insert_asgs_config_items()')
+
+    # insert the run params into the DB
+    ret_val = db_info.insert_config_items(instance_id, param_list)
+
+    # test the result, empty str == success
+    assert ret_val is None
+
+
 def test_insert_ecflow_config_items():
     """
     Tests the parsing of ecflow data and insertion into the DB
@@ -115,8 +161,11 @@ def test_insert_ecflow_config_items():
     # insert an instance record into the DB to get things primed
     instance_id = db_info.insert_instance(state_id, site_id, run_props, context='test_insert_ecflow_config_items()')
 
+    # make sure we are in debug mode and have a workflow type
+    run_props.update({'workflow_type': 'ECFLOW', 'supervisor_job_status': 'debug'})
+
     # insert the run params into the DB
-    ret_val = db_info.insert_ecflow_config_items(instance_id, run_props, 'debug')
+    ret_val = db_info.insert_config_items(instance_id, run_props)
 
     # test the result, empty str == success
     assert ret_val is None
@@ -124,7 +173,7 @@ def test_insert_ecflow_config_items():
 
 def test_ecflow_run_time_queue_callback():
     """
-    Tests the handling of a ecflow run time msg
+    Tests the handling of an ecflow run time msg
 
     :return:
     """
@@ -144,7 +193,7 @@ def test_ecflow_run_time_queue_callback():
 
 def test_ecflow_run_props_queue_callback():
     """
-    Tests the handling of a ecflow run time msg
+    Tests the handling of an ecflow run time msg
 
     :return:
     """
@@ -203,8 +252,11 @@ def test_insert_hecras_config_items():
     # insert an instance record into the DB to get things primed
     instance_id = db_info.insert_instance(state_id, site_id, run_props, context='test_insert_hecras_config_items()')
 
+    # make sure we are in debug mode and have a workflow type
+    run_props.update({'workflow_type': 'HECRAS', 'supervisor_job_status': 'debug'})
+
     # insert the run params into the DB
-    ret_val = db_info.insert_hecras_config_items(instance_id, run_props, 'debug')
+    ret_val = db_info.insert_config_items(instance_id, run_props)
 
     # test the result, empty str == success
     assert ret_val is None
