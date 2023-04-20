@@ -6,20 +6,26 @@
 # SPDX-License-Identifier: MIT
 
 # This Dockerfile is used to build THE ASGS RabbitMQ message handler python image
+
 FROM python:3.11.3-slim
 
-# get some credit
-LABEL maintainer="powen@renci.org"
-
 # install basic tools
-RUN apt-get update
-RUN apt-get install -yq vim procps
+RUN apt-get update && apt-get -y upgrade && apt-get install -yq vim procps
 
 # update pip
 RUN pip install --upgrade pip
 
 # clear out the apt cache
 RUN apt-get clean
+
+# get some credit
+LABEL maintainer="powen@renci.org"
+
+# get the build argument that has the version
+ARG APP_VERSION=$(APP_VERSION)
+
+# now add the version arg value into a ENV param
+ENV APP_VERSION=$APP_VERSION
 
 # go to the directory where we are going to upload the repo
 WORKDIR /repo/message

@@ -10,6 +10,8 @@
 
     Authors: Lisa Stillwell, Phil Owen @RENCI.org
 """
+import os
+
 from src.common.logger import LoggingUtil
 from src.common.queue_callbacks import QueueCallbacks
 from src.common.queue_utils import QueueUtils
@@ -28,7 +30,10 @@ def run():
     logger = LoggingUtil.init_logging("APSVIZ.Msg-Handler.ecflow_run_time_msg_svc", level=log_level, line_format='medium',
                                       log_file_path=log_path)
 
-    logger.info("Initializing ecflow_rt_run_props_msg_svc handler.")
+    # set the app version
+    app_version = os.getenv('APP_VERSION', 'Version number not set')
+
+    logger.info("Initializing ecflow_rt_run_props_msg_svc handler, version: %s.", app_version)
 
     try:
         # get a reference to the common callback handler

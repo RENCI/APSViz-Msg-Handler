@@ -10,6 +10,8 @@
 
     Authors: Lisa Stillwell, Phil Owen @RENCI.org
 """
+import os
+
 from src.common.logger import LoggingUtil
 from src.common.queue_callbacks import QueueCallbacks
 from src.common.queue_utils import QueueUtils
@@ -27,7 +29,10 @@ def run():
     # create a logger
     logger = LoggingUtil.init_logging("APSVIZ.Msg-Handler.asgs_status_msg_svc", level=log_level, line_format='medium', log_file_path=log_path)
 
-    logger.info("Initializing asgs_status_msg_svc handler.")
+    # set the app version
+    app_version = os.getenv('APP_VERSION', 'Version number not set')
+
+    logger.info("Initializing asgs_status_msg_svc handler, version: %s.", app_version)
 
     try:
         # get an instance to the callback handler
