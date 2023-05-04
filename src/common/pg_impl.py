@@ -19,7 +19,7 @@ from src.common.asgs_constants import AsgsConstants
 
 class PGImplementation(PGUtilsMultiConnect):
     """
-        Class that contains DB calls for the Archiver.
+        Class that contains DB calls for the message handler.
 
         Note this class inherits from the PGUtilsMultiConnect class
         which has all the connection and cursor handling.
