@@ -55,6 +55,9 @@ class QueueUtils:
         # save the queue name
         self.queue_name = _queue_name
 
+        # save the relay enabled flag
+        self.relay_enabled = os.environ.get('RELAY_ENABLED', 'False').lower() in ('true', '1', 't')
+
         # define and init the object used to handle ASGS constant conversions
         self.asgs_constants_inst = AsgsConstants(_logger=self.logger)
 
@@ -117,49 +120,49 @@ class QueueUtils:
         # return the queue channel
         return channel
 
-    def relay_msg(self, queue_name: str, body: bytes) -> bool:
+    def relay_msg(self, body: bytes) -> bool:
         """
-        relays a received message to another queue
+        relays a received message to another queue. it expects the value directly from the queue.
 
-        :param: queue_name
         :param: body
         :return:
         """
-
         # init the return value
         ret_val: bool = True
 
-        # init the connection
-        connection = None
+        # if relay is not enables
+        if self.relay_enabled:
+            # init the connection
+            connection = None
 
-        try:
-            # create credentials
-            credentials = pika.PlainCredentials(os.environ.get("RELAY_RABBITMQ_USER"), os.environ.get("RELAY_RABBITMQ_PW"))
+            try:
+                # create credentials
+                credentials = pika.PlainCredentials(os.environ.get("RELAY_RABBITMQ_USER"), os.environ.get("RELAY_RABBITMQ_PW"))
 
-            # create connection parameters
-            parameters = pika.ConnectionParameters(os.environ.get("RELAY_RABBITMQ_HOST"), 5672, '/', credentials, socket_timeout=2)
+                # create connection parameters
+                parameters = pika.ConnectionParameters(os.environ.get("RELAY_RABBITMQ_HOST"), 5672, '/', credentials, socket_timeout=2)
 
-            # get a connection to the queue
-            connection = pika.BlockingConnection(parameters)
+                # get a connection to the queue
+                connection = pika.BlockingConnection(parameters)
 
-            # get a channel to the consumer
-            channel = connection.channel()
+                # get a channel to the consumer
+                channel = connection.channel()
 
-            # create the queue (is this needed?)
-            channel.queue_declare(queue=queue_name)
+                # create the queue (is this needed?)
+                channel.queue_declare(queue=self.queue_name)
 
-            # push the message to the queue
-            channel.basic_publish(exchange='', routing_key=queue_name, body=body)
+                # push the message to the queue
+                channel.basic_publish(exchange='', routing_key=self.queue_name, body=body)
 
-        except Exception:
-            self.logger.exception("Error: Exception relaying message to queue: %s.", self.queue_name)
+            except Exception:
+                self.logger.exception("Error: Exception relaying message to queue: %s.", self.queue_name)
 
-            # set the return status to fail
-            ret_val = False
-        finally:
-            # close the connection if it was created
-            if connection is not None:
-                connection.close()
+                # set the return status to fail
+                ret_val = False
+            finally:
+                # close the connection if it was created
+                if connection is not None:
+                    connection.close()
 
         # return pass/fail
         return ret_val

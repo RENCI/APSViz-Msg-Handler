@@ -161,6 +161,9 @@ class QueueCallbacks:
 
                     # now insert message into the event table
                     self.db_info.insert_event(site_id[0], event_group_id, event_type_id, msg_obj, context)
+
+                    # relay the msg
+                    ret_val = self.queue_utils.relay_msg(body)
             else:
                 err_msg = f"{context}: Error - Cannot retrieve advisory number, site, event type or state type ids."
 
@@ -266,6 +269,9 @@ class QueueCallbacks:
 
                                 # set the return to indicate failure
                                 ret_val = False
+                            else:
+                                # relay the msg
+                                ret_val = self.queue_utils.relay_msg(body)
                         else:
                             err_msg: str = f"{context}: Error invalid message - 'param_list' key is missing from the run properties message. " \
                                            "Ignoring message."
@@ -408,6 +414,9 @@ class QueueCallbacks:
 
                     # now insert message into the event table
                     self.db_info.insert_event(site_id[0], event_group_id, event_type_id, msg_obj, context)
+
+                    # relay the msg
+                    ret_val = self.queue_utils.relay_msg(body)
             else:
                 err_msg = f"{context}: Error - Cannot retrieve advisory number, site, event type or state type ids."
 
@@ -518,6 +527,9 @@ class QueueCallbacks:
 
                             # set the failure flag
                             ret_val = False
+                        else:
+                            # relay the msg
+                            ret_val = self.queue_utils.relay_msg(body)
                     else:
                         err_msg: str = f"{context}: Error invalid instance ID. Ignoring message for ECFLOW {msg_obj.get('physical_location', 'N/A')}."
                         self.logger.error(err_msg)
@@ -635,6 +647,9 @@ class QueueCallbacks:
 
                             # set the failure flag
                             ret_val = False
+                        else:
+                            # relay the msg
+                            ret_val = self.queue_utils.relay_msg(body)
                     else:
                         err_msg: str = f"{context}: Error invalid instance ID. Ignoring message for HEC/RAS " \
                                        f"{msg_obj.get('physical_location', 'N/A')}."
