@@ -90,9 +90,6 @@ def test_insert_asgs_config_items():
     # define and init the object that will handle ASGS DB operations
     db_info = PGImplementation(db_name)
 
-    # instantiate the utility class
-    queue_utils = QueueUtils(_queue_name='')
-
     # load the json
     with open(os.path.join(os.path.dirname(__file__), 'test_asgs_run_props.json'), encoding='UTF-8') as test_fh:
         run_props = json.loads(test_fh.read())
