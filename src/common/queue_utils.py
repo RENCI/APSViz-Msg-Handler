@@ -120,7 +120,7 @@ class QueueUtils:
         # return the queue channel
         return channel
 
-    def relay_msg(self, body: bytes) -> bool:
+    def relay_msg(self, body: bytes, force: bool = False) -> bool:
         """
         relays a received message to another queue. it expects the value directly from the queue.
 
@@ -130,8 +130,8 @@ class QueueUtils:
         # init the return value
         ret_val: bool = True
 
-        # if relay is not enables
-        if self.relay_enabled:
+        # if relay is enabled or being forced
+        if self.relay_enabled or force:
             # init the connection
             connection = None
 
