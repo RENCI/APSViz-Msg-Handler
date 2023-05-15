@@ -30,7 +30,7 @@ if __name__ == '__main__':
     queue_utils = QueueUtils(args.queue)
 
     # send the msg to the queue specified
-    success = queue_utils.relay_msg('test message', True)
+    success = queue_utils.relay_msg(args.queue, True)
 
     # check the result
     assert success
