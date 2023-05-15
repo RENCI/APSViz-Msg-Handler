@@ -49,7 +49,7 @@ class QueueUtils:
                                      'time.currentcycle': ['currentcycle'], 'forcing.advisory': ['advisory'],
                                      'forcing.ensemblename': ['asgs.enstorm', 'enstorm'], 'forcing.metclass': [],
                                      'forcing.stormname': ['stormname', 'forcing.tropicalcyclone.stormname'],
-                                     'forcing.waves': ['config.coupling.waves'], 'forcing.stormnumber': ['storm'],
+                                     'forcing.waves': ['config.coupling.waves'], 'forcing.stormnumber': ['storm', 'stormnumber'],
                                      'output.downloadurl': ['downloadurl'], 'forcing.vortexmodel': ['forcing.tropicalcyclone.vortexmodel']}
 
         # save the queue name
