@@ -36,7 +36,7 @@ class GeneralUtils:
             log_level, log_path = LoggingUtil.prep_for_logging()
 
             # create a logger
-            self.logger = LoggingUtil.init_logging("APSVIZ.Archiver.GeneralUtils", level=log_level, line_format='medium', log_file_path=log_path)
+            self.logger = LoggingUtil.init_logging("APSVIZ.Msg-Handler.GeneralUtils", level=log_level, line_format='medium', log_file_path=log_path)
 
         # init the Slack channels
         self.slack_channels: dict = {'slack_status_channel': os.getenv('SLACK_STATUS_CHANNEL'),

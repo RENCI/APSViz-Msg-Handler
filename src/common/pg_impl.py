@@ -35,7 +35,7 @@ class PGImplementation(PGUtilsMultiConnect):
             log_level, log_path = LoggingUtil.prep_for_logging()
 
             # create a logger
-            self.logger = LoggingUtil.init_logging("APSViz.Msg_Handler.PGImplementation", level=log_level, line_format='medium',
+            self.logger = LoggingUtil.init_logging("APSViz.Msg-Handler.PGImplementation", level=log_level, line_format='medium',
                                                    log_file_path=log_path)
 
         # get the ASGS constants
