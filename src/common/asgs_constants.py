@@ -23,7 +23,7 @@ class AsgsConstants:
     # define the LU constant lookups
     pct_complete_lu = {'0': 0, '1': 5, '2': 20, '3': 40, '4': 60, '5': 90, '6': 100, '7': 0, '8': 0, '9': 0, '10': 40, '11': 90, '12': 20}
     site_lu = {'RENCI': 0, 'TACC': 1, 'LSU': 2, 'UCF': 3, 'George Mason': 4, 'Penguin': 5, 'LONI': 6, 'Seahorse': 7, 'QB2': 8, 'CCT': 9, 'PSC': 10,
-               'UGA': 10}
+               'UGA': 11}
     event_type_lu = {'RSTR': 0, 'PRE1': 1, 'NOWC': 2, 'PRE2': 3, 'FORE': 4, 'POST': 5, 'REND': 6, 'STRT': 7, 'HIND': 8, 'EXIT': 9, 'FSTR': 10,
                      'FEND': 11, 'PNOW': 12}
     state_type_lu = {'INIT': 0, 'RUNN': 1, 'PEND': 2, 'FAIL': 3, 'WARN': 4, 'IDLE': 5, 'CMPL': 6, 'NONE': 7, 'WAIT': 8, 'EXIT': 9, 'STALLED': 10}
