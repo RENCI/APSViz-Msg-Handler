@@ -112,6 +112,7 @@ class AsgsConstants:
         qb2 = self.get_lu_id('QB2', 'site', context)
         cct = self.get_lu_id('CCT', 'site', context)
         psc = self.get_lu_id('PSC', 'site', context)
+        uga = self.get_lu_id('UGA', 'site', context)
 
         # return the list of ids
-        return [cct, loni, lsu, penguin, psc, qb2, renci, seahorse, tacc]
+        return [cct, loni, lsu, penguin, psc, qb2, renci, seahorse, tacc, uga]
