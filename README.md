@@ -20,8 +20,9 @@ RabbitMQ message handlers for the APSViz project, including handlers for:
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://opensource.org/licenses/)
 [![RENCI License](https://img.shields.io/badge/License-RENCI-blue.svg)](https://renci.org/)
 #### Components and versions...
-[![Python](https://img.shields.io/badge/Python-3.11.1-orange)](https://github.com/PyCQA/pylint)
-[![Linting Pylint](https://img.shields.io/badge/Pylint-%202.15.5-yellowgreen)](https://github.com/PyCQA/pylint)
+[![Python](https://img.shields.io/badge/Python-3.11.3-orange)](https://github.com/PyCQA/pylint)
+[![Linting Pylint](https://img.shields.io/badge/Pylint-%202.17.4-yellowgreen)](https://github.com/PyCQA/pylint)
+[![Pytest](https://img.shields.io/badge/Pytest-%207.3.1-yellowgreen)](https://github.com/pytest-dev/pytest)
 #### Build status...
 [![Pylint](https://github.com/RENCI/APSViz-Msg-Handler/actions/workflows/pylint.yml/badge.svg)](https://github.com/RENCI/APSViz-Msg-Handler/actions/workflows/pylint.yml)
 [![Build and push the Docker image](https://github.com/RENCI/APSViz-Msg-Handler/actions/workflows/image-push.yml/badge.svg)](https://github.com/RENCI/APSViz-Msg-Handler/actions/workflows/image-push.yml)
