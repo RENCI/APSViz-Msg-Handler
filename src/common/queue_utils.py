@@ -140,7 +140,8 @@ class QueueUtils:
                 credentials: pika.PlainCredentials = pika.PlainCredentials(os.environ.get("RELAY_RABBITMQ_USER"), os.environ.get("RELAY_RABBITMQ_PW"))
 
                 # create connection parameters
-                parameters: pika.ConnectionParameters = pika.ConnectionParameters(os.environ.get("RELAY_RABBITMQ_HOST"), 5672, '/', credentials, socket_timeout=2)
+                parameters: pika.ConnectionParameters = pika.ConnectionParameters(os.environ.get("RELAY_RABBITMQ_HOST"), 5672, '/', credentials,
+                                                                                  socket_timeout=2)
 
                 # get a connection to the queue
                 connection: pika.BlockingConnection = pika.BlockingConnection(parameters)
