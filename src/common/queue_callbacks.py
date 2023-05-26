@@ -164,6 +164,16 @@ class QueueCallbacks:
 
                     # relay the msg
                     ret_val = self.queue_utils.relay_msg(body)
+
+                    # alert on failure
+                    if not ret_val:
+                        # create an error message
+                        err_msg = f"{context}: Error - Failure to relay message for instance id: {instance_id}."
+
+                        self.logger.error(err_msg)
+
+                        # send a message to slack
+                        self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
             else:
                 err_msg = f"{context}: Error - Cannot retrieve advisory number, site, event type or state type ids."
 
@@ -272,6 +282,16 @@ class QueueCallbacks:
                             else:
                                 # relay the msg
                                 ret_val = self.queue_utils.relay_msg(body)
+
+                                # alert on failure
+                                if not ret_val:
+                                    # create an error message
+                                    err_msg = f"{context}: Error - Failure to relay message for instance id: {instance_id}."
+
+                                    self.logger.error(err_msg)
+
+                                    # send a message to slack
+                                    self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
                         else:
                             err_msg: str = f"{context}: Error invalid message - 'param_list' key is missing from the run properties message. " \
                                            "Ignoring message."
@@ -417,6 +437,16 @@ class QueueCallbacks:
 
                     # relay the msg
                     ret_val = self.queue_utils.relay_msg(body)
+
+                    # alert on failure
+                    if not ret_val:
+                        # create an error message
+                        err_msg = f"{context}: Error - Failure to relay message for instance id: {instance_id}."
+
+                        self.logger.error(err_msg)
+
+                        # send a message to slack
+                        self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
             else:
                 err_msg = f"{context}: Error - Cannot retrieve advisory number, site, event type or state type ids."
 
@@ -530,6 +560,16 @@ class QueueCallbacks:
                         else:
                             # relay the msg
                             ret_val = self.queue_utils.relay_msg(body)
+
+                            # alert on failure
+                            if not ret_val:
+                                # create an error message
+                                err_msg = f"{context}: Error - Failure to relay message for instance id: {instance_id}."
+
+                                self.logger.error(err_msg)
+
+                                # send a message to slack
+                                self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
                     else:
                         err_msg: str = f"{context}: Error invalid instance ID. Ignoring message for ECFLOW {msg_obj.get('physical_location', 'N/A')}."
                         self.logger.error(err_msg)
@@ -650,6 +690,16 @@ class QueueCallbacks:
                         else:
                             # relay the msg
                             ret_val = self.queue_utils.relay_msg(body)
+
+                            # alert on failure
+                            if not ret_val:
+                                # create an error message
+                                err_msg = f"{context}: Error - Failure to relay message for instance id: {instance_id}."
+
+                                self.logger.error(err_msg)
+
+                                # send a message to slack
+                                self.general_utils.send_slack_msg(err_msg, 'slack_issues_channel')
                     else:
                         err_msg: str = f"{context}: Error invalid instance ID. Ignoring message for HEC/RAS " \
                                        f"{msg_obj.get('physical_location', 'N/A')}."
