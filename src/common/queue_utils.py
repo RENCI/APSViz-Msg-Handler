@@ -127,21 +127,25 @@ class QueueUtils:
         # init the return value
         ret_val: bool = True
 
+        # get the relay credentials
+        relay_user = os.environ.get("RELAY_RABBITMQ_USER")
+        relay_password = os.environ.get("RELAY_RABBITMQ_PW")
+        relay_host = os.environ.get("RELAY_RABBITMQ_HOST")
+
         # get the relay enabled flag
         relay_enabled = os.environ.get('RELAY_ENABLED', 'False').lower() in ('true', '1', 't')
 
-        # if relay is enabled or being forced
-        if relay_enabled or force:
+        # if we have all the queue info and relay is enabled or being forced
+        if (relay_user and relay_password and relay_host) and (relay_enabled or force):
             # init the connection
             connection = None
 
             try:
                 # create credentials
-                credentials: pika.PlainCredentials = pika.PlainCredentials(os.environ.get("RELAY_RABBITMQ_USER"), os.environ.get("RELAY_RABBITMQ_PW"))
+                credentials: pika.PlainCredentials = pika.PlainCredentials(relay_user, relay_password)
 
                 # create connection parameters
-                parameters: pika.ConnectionParameters = pika.ConnectionParameters(os.environ.get("RELAY_RABBITMQ_HOST"), 5672, '/', credentials,
-                                                                                  socket_timeout=2)
+                parameters: pika.ConnectionParameters = pika.ConnectionParameters(relay_host, 5672, '/', credentials, socket_timeout=2)
 
                 # get a connection to the queue
                 connection: pika.BlockingConnection = pika.BlockingConnection(parameters)
