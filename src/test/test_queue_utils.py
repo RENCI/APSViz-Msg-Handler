@@ -24,6 +24,7 @@ test_data: list = [['test_ecflow_run_props.json', msg_tester.ecflow_expected_tra
 def test_asgs_legacy_transformer():
     """
     test the transformation of run params into asgs run params
+
     :return:
     """
     # for each set of test data
@@ -47,6 +48,11 @@ def test_asgs_legacy_transformer():
 
 
 def test_relay():
+    """
+    tests the message relay method
+
+    :return:
+    """
     queue_utils = QueueUtils(_queue_name='test', _logger=None)
 
     # send the msg to the queue specified
