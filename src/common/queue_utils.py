@@ -55,9 +55,6 @@ class QueueUtils:
         # save the queue name
         self.queue_name = _queue_name
 
-        # save the relay enabled flag
-        self.relay_enabled = os.environ.get('RELAY_ENABLED', 'False').lower() in ('true', '1', 't')
-
         # define and init the object used to handle ASGS constant conversions
         self.asgs_constants_inst = AsgsConstants(_logger=self.logger)
 
@@ -130,8 +127,11 @@ class QueueUtils:
         # init the return value
         ret_val: bool = True
 
+        # get the relay enabled flag
+        relay_enabled = os.environ.get('RELAY_ENABLED', 'False').lower() in ('true', '1', 't')
+
         # if relay is enabled or being forced
-        if self.relay_enabled or force:
+        if relay_enabled or force:
             # init the connection
             connection = None
 
