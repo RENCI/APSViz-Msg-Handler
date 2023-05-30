@@ -44,3 +44,13 @@ def test_asgs_legacy_transformer():
 
             # check the result
             assert ret_val == run_props
+
+
+def test_relay():
+    queue_utils = QueueUtils(_queue_name='test', _logger=None)
+
+    # send the msg to the queue specified
+    ret_val: bool = queue_utils.relay_msg('test', False)
+
+    # check the result
+    assert ret_val
