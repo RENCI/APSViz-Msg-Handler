@@ -119,9 +119,10 @@ class QueueUtils:
 
     def relay_msg(self, body: bytes, force: bool = False) -> bool:
         """
-        relays a received message to another queue. it expects the value directly from the queue.
+        relays a received message to another queue. It expects the value directly from the queue.
 
         :param: body
+        :param: force
         :return:
         """
         # init the return value
