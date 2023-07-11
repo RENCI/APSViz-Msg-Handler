@@ -506,7 +506,7 @@ class QueueCallbacks:
             msg_obj: json = json.loads(body)
 
             # transform the ecflow messages into the asgs equivalent
-            msg_obj = self.queue_utils.transform_msg_to_asgs_legacy(msg_obj)
+            msg_obj = self.queue_utils.extend_msg_to_asgs_legacy(msg_obj)
 
             # get the site id from the name in the message
             site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
@@ -635,7 +635,7 @@ class QueueCallbacks:
             msg_obj: json = json.loads(body)
 
             # transform the ecflow messages into the asgs equivalent
-            msg_obj = self.queue_utils.transform_msg_to_asgs_legacy(msg_obj)
+            msg_obj = self.queue_utils.extend_msg_to_asgs_legacy(msg_obj)
 
             # get the site id from the name in the message
             site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)

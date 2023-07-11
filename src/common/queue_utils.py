@@ -11,12 +11,13 @@
     Authors: Lisa Stillwell, Phil Owen @RENCI.org
 """
 import os
-import pika
+from enum import Enum
 
+import pika
 from src.common.asgs_constants import AsgsConstants
 from src.common.logger import LoggingUtil
 
-from enum import Enum
+
 
 
 class ReformatType(int, Enum):
@@ -233,31 +234,32 @@ class QueueUtils:
 
                     # make sure there is something to reformat. if not just skip it...
                     if param is not None and len(param) > 0:
-                        # grab the conversion type
-                        if value == ReformatType.INTEGER:
-                            # try to make the conversion
-                            if param.isdigit():
+                        # for any reformatting type
+                        match value:
+                            case ReformatType.INTEGER:
+                                # try to make the conversion
+                                if param.isdigit():
+                                    # make the conversion
+                                    ret_val.update({key: str(int(param))})
+                            case ReformatType.FLOAT:
+                                # try to make the conversion
+                                if param.replace('.', '1').replace('e', '1').isdigit():
+                                    # make the conversion
+                                    ret_val.update({key: str(float(param))})
+                            case ReformatType.UPPERCASE:
                                 # make the conversion
-                                ret_val.update({key: str(int(param))})
-                        elif value == ReformatType.FLOAT:
-                            # try to make the conversion
-                            if param.replace('.', '1').replace('e', '1').isdigit():
+                                ret_val.update({key: param.upper()})
+                            case ReformatType.LOWERCASE:
                                 # make the conversion
-                                ret_val.update({key: str(float(param))})
-                        elif value == ReformatType.UPPERCASE:
-                            # make the conversion
-                            ret_val.update({key: param.upper()})
-                        elif value == ReformatType.LOWERCASE:
-                            # make the conversion
-                            ret_val.update({key: param.lower()})
-                        elif value == value == ReformatType.SENTENCECASE:
-                            # make the conversion
-                            ret_val.update({key: param[:1].upper() + param[1:].lower()})
-                        elif value == ReformatType.STRING:
-                            # make the conversion
-                            ret_val.update({key: str(param)})
-                        else:
-                            self.logger.error("Invalid conversion type found.")
+                                ret_val.update({key: param.lower()})
+                            case ReformatType.SENTENCECASE:
+                                # make the conversion
+                                ret_val.update({key: param[:1].upper() + param[1:].lower()})
+                            case ReformatType.STRING:
+                                # make the conversion
+                                ret_val.update({key: str(param)})
+                            case _:
+                                self.logger.error("Invalid conversion type found.")
                 except Exception:
                     # log the exception
                     self.logger.error('Error: Could not convert %s value %s into %s.', key, param, value)

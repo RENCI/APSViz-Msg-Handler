@@ -141,7 +141,7 @@ def test_insert_ecflow_config_items():
         run_props = json.loads(test_fh.read())
 
     # transform the ecflow params into addition al asgs params
-    ret_val = queue_utils.transform_msg_to_asgs_legacy(run_props)
+    ret_val = queue_utils.extend_msg_to_asgs_legacy(run_props)
 
     # add in the expected transformations
     run_props.update(ecflow_expected_transformed_params)
@@ -192,7 +192,7 @@ def test_insert_hecras_config_items():
         run_props = json.loads(test_fh.read())
 
     # transform the ecflow params into addition al asgs params
-    ret_val = queue_utils.transform_msg_to_asgs_legacy(run_props)
+    ret_val = queue_utils.extend_msg_to_asgs_legacy(run_props)
 
     # add in the expected transformations
     run_props.update(hecras_expected_transformed_params)

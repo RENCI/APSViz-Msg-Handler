@@ -35,7 +35,7 @@ def test_asgs_legacy_extender():
             run_props = json.loads(test_fh.read())
 
             # instantiate the utility class
-            queue_utils = QueueUtils(_queue_name='', _logger=None)
+            queue_utils = QueueUtils(_queue_name='')
 
             # get the transformed list
             ret_val = queue_utils.extend_msg_to_asgs_legacy(run_props)
@@ -64,7 +64,7 @@ def test_transform_msg_params():
                              'physical_location': 'no_change'}
 
     # instantiate the utility class
-    queue_utils = QueueUtils(_queue_name='', _logger=None)
+    queue_utils = QueueUtils(_queue_name='')
 
     # make up some tests
     queue_utils.msg_transform_params = {'forcing.stormnumber': ReformatType.INTEGER, 'storm': ReformatType.FLOAT, 'stormnumber': ReformatType.STRING,
@@ -84,7 +84,7 @@ def test_relay():
 
     :return:
     """
-    queue_utils = QueueUtils(_queue_name='test', _logger=None)
+    queue_utils = QueueUtils(_queue_name='test')
 
     # send the msg to the queue specified
     ret_val: bool = queue_utils.relay_msg('test', False)
