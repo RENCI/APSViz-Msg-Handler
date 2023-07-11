@@ -16,6 +16,21 @@ import pika
 from src.common.asgs_constants import AsgsConstants
 from src.common.logger import LoggingUtil
 
+from enum import Enum
+
+
+class ReformatType(int, Enum):
+    """
+    Enum class that defines the system that needs to be synchronized
+    with a copy/move/remove operation
+    """
+    SENTENCECASE = 1
+    UPPERCASE = 2
+    LOWERCASE = 3
+    INTEGER = 4
+    FLOAT = 5
+    STRING = 6
+
 
 class QueueUtils:
     """
@@ -43,15 +58,19 @@ class QueueUtils:
             self.logger = LoggingUtil.init_logging("APSVIZ.Msg-Handler.QueueUtils", level=log_level, line_format='medium', log_file_path=log_path)
 
         # declare the ECFlow and HEC/RAS target params to asgs keys mapping dict
-        self.msg_transform_params = {'suite.physical_location': ['physical_location', 'monitoring.rmqmessaging.locationname'],
-                                     'suite.instance_name': ['instance_name', 'instancename'], 'suite.project_code': [], 'suite.uid': ['uid'],
-                                     'suite.adcirc.gridname': ['ADCIRCgrid', 'adcirc.gridname'], 'time.currentdate': ['currentdate'],
-                                     'time.currentcycle': ['currentcycle'], 'forcing.advisory': ['advisory'],
-                                     'forcing.ensemblename': ['asgs.enstorm', 'enstorm'], 'forcing.metclass': [],
-                                     'forcing.stormname': ['stormname', 'forcing.tropicalcyclone.stormname'],
-                                     'forcing.waves': ['config.coupling.waves'], 'forcing.stormnumber': ['storm', 'stormnumber'],
-                                     'output.downloadurl': ['downloadurl'], 'forcing.vortexmodel': ['forcing.tropicalcyclone.vortexmodel']}
+        self.msg_extend_params = {'suite.physical_location': ['physical_location', 'monitoring.rmqmessaging.locationname'],
+                                  'suite.instance_name': ['instance_name', 'instancename'], 'suite.project_code': [], 'suite.uid': ['uid'],
+                                  'suite.adcirc.gridname': ['ADCIRCgrid', 'adcirc.gridname'], 'time.currentdate': ['currentdate'],
+                                  'time.currentcycle': ['currentcycle'], 'forcing.advisory': ['advisory'],
+                                  'forcing.ensemblename': ['asgs.enstorm', 'enstorm'], 'forcing.metclass': [],
+                                  'forcing.stormname': ['stormname', 'forcing.tropicalcyclone.stormname'], 'forcing.waves': ['config.coupling.waves'],
+                                  'forcing.stormnumber': ['storm', 'stormnumber'], 'output.downloadurl': ['downloadurl'],
+                                  'forcing.vortexmodel': ['forcing.tropicalcyclone.vortexmodel']}
 
+        # declare param transformation selections
+        self.msg_transform_params = {'forcing.stormnumber': ReformatType.INTEGER, 'storm': ReformatType.INTEGER, 'stormnumber': ReformatType.INTEGER,
+                                     'forcing.stormname':  ReformatType.UPPERCASE, 'stormname': ReformatType.UPPERCASE,
+                                     'forcing.tropicalcyclone.stormname': ReformatType.UPPERCASE}
         # save the queue name
         self.queue_name = _queue_name
 
@@ -173,9 +192,9 @@ class QueueUtils:
         # return pass/fail
         return ret_val
 
-    def transform_msg_to_asgs_legacy(self, run_params: dict) -> dict:
+    def extend_msg_to_asgs_legacy(self, run_params: dict) -> dict:
         """
-        Transforms a ECFlow message into an ASGS message
+        Extends params from a ECFlow message to include ASGS message legacy params
 
         :return:
         """
@@ -183,13 +202,65 @@ class QueueUtils:
         ret_val: dict = run_params.copy()
 
         # go through the params, search for a target, transform it into the ASGS equivalent
-        for key, values in self.msg_transform_params.items():
+        for key, values in self.msg_extend_params.items():
             # find this in the run params
             if key in run_params:
                 # grab the new keys from the transform asgs keys list
                 for new_key in values:
                     # add the transform key with the run props data value to the dict
                     ret_val.update({new_key: run_params[key]})
+
+        # return the new set of transformed params
+        return ret_val
+
+    def transform_msg_params(self, run_params: dict) -> dict:
+        """
+        uses a mapping to determine if a parameter should be reformatted into another format.
+
+        :param run_params:
+        :return:
+        """
+        # save the entire incoming dict into the return
+        ret_val: dict = run_params.copy()
+
+        # go through the params, search for a target, transform it into the ASGS equivalent
+        for key, value in self.msg_transform_params.items():
+            # find this in the run params
+            if key in run_params:
+                try:
+                    # grab the parameter value
+                    param: str = run_params[key]
+
+                    # make sure there is something to reformat. if not just skip it...
+                    if param is not None and len(param) > 0:
+                        # grab the conversion type
+                        if value == ReformatType.INTEGER:
+                            # try to make the conversion
+                            if param.isdigit():
+                                # make the conversion
+                                ret_val.update({key: str(int(param))})
+                        elif value == ReformatType.FLOAT:
+                            # try to make the conversion
+                            if param.replace('.', '1').replace('e', '1').isdigit():
+                                # make the conversion
+                                ret_val.update({key: str(float(param))})
+                        elif value == ReformatType.UPPERCASE:
+                            # make the conversion
+                            ret_val.update({key: param.upper()})
+                        elif value == ReformatType.LOWERCASE:
+                            # make the conversion
+                            ret_val.update({key: param.lower()})
+                        elif value == value == ReformatType.SENTENCECASE:
+                            # make the conversion
+                            ret_val.update({key: param[:1].upper() + param[1:].lower()})
+                        elif value == ReformatType.STRING:
+                            # make the conversion
+                            ret_val.update({key: str(param)})
+                        else:
+                            self.logger.error("Invalid conversion type found.")
+                except Exception:
+                    # log the exception
+                    self.logger.error('Error: Could not convert %s value %s into %s.', key, param, value)
 
         # return the new set of transformed params
         return ret_val

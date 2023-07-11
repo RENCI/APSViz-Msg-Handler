@@ -15,6 +15,7 @@ import datetime
 from src.common.pg_utils_multi import PGUtilsMultiConnect
 from src.common.logger import LoggingUtil
 from src.common.asgs_constants import AsgsConstants
+from src.common.queue_utils import QueueUtils
 
 
 class PGImplementation(PGUtilsMultiConnect):
@@ -40,6 +41,9 @@ class PGImplementation(PGUtilsMultiConnect):
 
         # get the ASGS constants
         self.asgs_constants = AsgsConstants(_logger=self.logger)
+
+        # create the general queue utilities class
+        self.queue_utils = QueueUtils(_logger=self.logger)
 
         # init the base class
         PGUtilsMultiConnect.__init__(self, 'APSViz.Settings', db_names, _logger=self.logger, _auto_commit=_auto_commit)
@@ -345,6 +349,9 @@ class PGImplementation(PGUtilsMultiConnect):
 
         # init the return value
         ret_msg = None
+
+        # apply data formatting to the run props
+        params = self.queue_utils.transform_msg_params(params)
 
         self.logger.debug("param_list: %s", params)
 
