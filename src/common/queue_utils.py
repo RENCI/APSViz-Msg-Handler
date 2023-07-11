@@ -23,7 +23,7 @@ class ReformatType(int, Enum):
     Enum class that defines the system that needs to be synchronized
     with a copy/move/remove operation
     """
-    SENTENCECASE = 1
+    SENTENCE_CASE = 1
     UPPERCASE = 2
     LOWERCASE = 3
     INTEGER = 4
@@ -167,7 +167,7 @@ class QueueUtils:
                 parameters: pika.ConnectionParameters = pika.ConnectionParameters(relay_host, 5672, '/', credentials, socket_timeout=2)
 
                 # get a connection to the queue
-                connection: pika.BlockingConnection = pika.BlockingConnection(parameters)
+                connection = pika.BlockingConnection(parameters)
 
                 # get a channel to the consumer
                 channel: pika.adapters.blocking_connection.BlockingChannel = connection.channel()
@@ -222,6 +222,9 @@ class QueueUtils:
         # save the entire incoming dict into the return
         ret_val: dict = run_params.copy()
 
+        # init the param value
+        param: str = ''
+
         # go through the params, search for a target, transform it into the ASGS equivalent
         for key, value in self.msg_transform_params.items():
             # find this in the run params
@@ -250,7 +253,7 @@ class QueueUtils:
                             case ReformatType.LOWERCASE:
                                 # make the conversion
                                 ret_val.update({key: param.lower()})
-                            case ReformatType.SENTENCECASE:
+                            case ReformatType.SENTENCE_CASE:
                                 # make the conversion
                                 ret_val.update({key: param[:1].upper() + param[1:].lower()})
                             case ReformatType.STRING:

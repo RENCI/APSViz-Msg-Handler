@@ -69,7 +69,7 @@ def test_transform_msg_params():
     # make up some tests
     queue_utils.msg_transform_params = {'forcing.stormnumber': ReformatType.INTEGER, 'storm': ReformatType.FLOAT, 'stormnumber': ReformatType.STRING,
                                         'forcing.stormname': ReformatType.UPPERCASE, 'stormname': ReformatType.LOWERCASE,
-                                        'forcing.tropicalcyclone.stormname': ReformatType.SENTENCECASE}
+                                        'forcing.tropicalcyclone.stormname': ReformatType.SENTENCE_CASE}
 
     # get the transformed list
     ret_val = queue_utils.transform_msg_params(test_params)
