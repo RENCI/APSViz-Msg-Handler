@@ -18,8 +18,6 @@ from src.common.asgs_constants import AsgsConstants
 from src.common.logger import LoggingUtil
 
 
-
-
 class ReformatType(int, Enum):
     """
     Enum class that defines the system that needs to be synchronized
