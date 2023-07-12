@@ -146,51 +146,55 @@ class QueueUtils:
         # init the return value
         ret_val: bool = True
 
-        # get the relay credentials
-        relay_user = os.environ.get("RELAY_RABBITMQ_USER")
-        relay_password = os.environ.get("RELAY_RABBITMQ_PW")
-        relay_host = os.environ.get("RELAY_RABBITMQ_HOST")
-
-        # get the relay enabled flag
-        relay_enabled = os.environ.get('RELAY_ENABLED', 'False').lower() in ('true', '1', 't')
-
         # get the flag (file existence) that indicates we are force stopping all message relaying
         # this flag overrides all other message relaying flags (presumed to be temporary)
-        no_relay = os.path.exists(os.path.join(os.path.dirname(__file__), '../', '../', str('norelay')))
+        override_relay: bool = os.path.exists(os.path.join(os.path.dirname(__file__), '../', '../', str('norelay')))
 
-        # if we have all the queue info and relay is enabled or being forced
-        if not no_relay and ((relay_user and relay_password and relay_host) and (relay_enabled or force)):
-            # init the connection
-            connection = None
+        # this will force no message relaying
+        if not override_relay:
+            # get the relay credentials
+            relay_user: str = os.environ.get("RELAY_RABBITMQ_USER")
+            relay_password: str = os.environ.get("RELAY_RABBITMQ_PW")
+            relay_host: str = os.environ.get("RELAY_RABBITMQ_HOST")
 
-            try:
-                # create credentials
-                credentials: pika.PlainCredentials = pika.PlainCredentials(relay_user, relay_password)
+            # if there is a place specified to relay a message to
+            if relay_user and relay_password and relay_host:
+                # get the relay enabled flag. if force=true is passed in it will override the environment variable
+                relay_enabled: bool = os.environ.get('RELAY_ENABLED', 'False').lower() in ('true', '1', 't') or force
 
-                # create connection parameters
-                parameters: pika.ConnectionParameters = pika.ConnectionParameters(relay_host, 5672, '/', credentials, socket_timeout=2)
+                # if relay is enabled or being forced
+                if relay_enabled:
+                    # init the connection
+                    connection = None
 
-                # get a connection to the queue
-                connection = pika.BlockingConnection(parameters)
+                    try:
+                        # create credentials
+                        credentials: pika.PlainCredentials = pika.PlainCredentials(relay_user, relay_password)
 
-                # get a channel to the consumer
-                channel: pika.adapters.blocking_connection.BlockingChannel = connection.channel()
+                        # create connection parameters
+                        parameters: pika.ConnectionParameters = pika.ConnectionParameters(relay_host, 5672, '/', credentials, socket_timeout=2)
 
-                # create the queue (is this needed?)
-                channel.queue_declare(queue=self.queue_name)
+                        # get a connection to the queue
+                        connection = pika.BlockingConnection(parameters)
 
-                # push the message to the queue
-                channel.basic_publish(exchange='', routing_key=self.queue_name, body=body)
+                        # get a channel to the consumer
+                        channel: pika.adapters.blocking_connection.BlockingChannel = connection.channel()
 
-            except Exception:
-                self.logger.error("Error: Exception relaying message to queue: %s.", self.queue_name)
+                        # create the queue (is this needed?)
+                        channel.queue_declare(queue=self.queue_name)
 
-                # set the return status to fail
-                ret_val = False
-            finally:
-                # close the connection if it was created
-                if connection is not None:
-                    connection.close()
+                        # push the message to the queue
+                        channel.basic_publish(exchange='', routing_key=self.queue_name, body=body)
+
+                    except Exception:
+                        self.logger.error("Error: Exception relaying message to queue: %s.", self.queue_name)
+
+                        # set the return status to fail
+                        ret_val = False
+                    finally:
+                        # close the connection if it was created
+                        if connection is not None:
+                            connection.close()
 
         # return pass/fail
         return ret_val
