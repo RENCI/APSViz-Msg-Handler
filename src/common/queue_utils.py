@@ -154,8 +154,12 @@ class QueueUtils:
         # get the relay enabled flag
         relay_enabled = os.environ.get('RELAY_ENABLED', 'False').lower() in ('true', '1', 't')
 
+        # get the flag (file existence) that indicates we are force stopping all message relaying
+        # this flag overrides all all other message relaying flags (presumed to be temporary)
+        no_relay = os.path.exists(os.path.join(os.path.dirname(__file__), '../', '../', str('norelay')))
+
         # if we have all the queue info and relay is enabled or being forced
-        if (relay_user and relay_password and relay_host) and (relay_enabled or force):
+        if not no_relay and ((relay_user and relay_password and relay_host) and (relay_enabled or force)):
             # init the connection
             connection = None
 
@@ -179,7 +183,7 @@ class QueueUtils:
                 channel.basic_publish(exchange='', routing_key=self.queue_name, body=body)
 
             except Exception:
-                self.logger.exception("Error: Exception relaying message to queue: %s.", self.queue_name)
+                self.logger.error("Error: Exception relaying message to queue: %s.", self.queue_name)
 
                 # set the return status to fail
                 ret_val = False
