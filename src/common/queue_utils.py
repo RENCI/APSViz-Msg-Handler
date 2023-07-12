@@ -155,7 +155,7 @@ class QueueUtils:
         relay_enabled = os.environ.get('RELAY_ENABLED', 'False').lower() in ('true', '1', 't')
 
         # get the flag (file existence) that indicates we are force stopping all message relaying
-        # this flag overrides all all other message relaying flags (presumed to be temporary)
+        # this flag overrides all other message relaying flags (presumed to be temporary)
         no_relay = os.path.exists(os.path.join(os.path.dirname(__file__), '../', '../', str('norelay')))
 
         # if we have all the queue info and relay is enabled or being forced

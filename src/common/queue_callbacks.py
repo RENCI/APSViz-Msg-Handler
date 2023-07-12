@@ -162,7 +162,7 @@ class QueueCallbacks:
                     # now insert message into the event table
                     self.db_info.insert_event(site_id[0], event_group_id, event_type_id, msg_obj, context)
 
-                    # relay the msg
+                    # relay the msg if enabled
                     ret_val = self.queue_utils.relay_msg(body)
 
                     # alert on failure
@@ -280,7 +280,7 @@ class QueueCallbacks:
                                 # set the return to indicate failure
                                 ret_val = False
                             else:
-                                # relay the msg
+                                # relay the msg if enabled
                                 ret_val = self.queue_utils.relay_msg(body)
 
                                 # alert on failure
@@ -435,7 +435,7 @@ class QueueCallbacks:
                     # now insert message into the event table
                     self.db_info.insert_event(site_id[0], event_group_id, event_type_id, msg_obj, context)
 
-                    # relay the msg
+                    # relay the msg if enabled
                     ret_val = self.queue_utils.relay_msg(body)
 
                     # alert on failure
@@ -558,7 +558,7 @@ class QueueCallbacks:
                             # set the failure flag
                             ret_val = False
                         else:
-                            # relay the msg
+                            # relay the msg if enabled
                             ret_val = self.queue_utils.relay_msg(body)
 
                             # alert on failure
@@ -688,7 +688,7 @@ class QueueCallbacks:
                             # set the failure flag
                             ret_val = False
                         else:
-                            # relay the msg
+                            # relay the msg if enabled
                             ret_val = self.queue_utils.relay_msg(body)
 
                             # alert on failure
