@@ -94,8 +94,8 @@ def test_relay():
     queue_utils = QueueUtils(_queue_name='test')
 
     # test level 1, create the norelay file
-    fp = open(os.path.join(os.path.dirname(__file__), '../../', 'norelay'), 'x')
-    fp.close()
+    with open(os.path.join(os.path.dirname(__file__), '../../', 'norelay'), 'x', encoding='UTF-8') as f_p:
+        f_p.close()
 
     # send the msg to the queue specified
     ret_val: bool = queue_utils.relay_msg(b'test')
