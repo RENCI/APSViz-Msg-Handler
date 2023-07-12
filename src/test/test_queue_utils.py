@@ -12,8 +12,8 @@
 """
 import os
 import json
-
 import test_msg_handlers as msg_tester
+
 from src.common.queue_utils import QueueUtils, ReformatType
 
 # create some test data references so the test can loop
@@ -82,12 +82,54 @@ def test_relay():
     """
     tests the message relay method
 
+    there is a matrix of possible conditions here:
+        level 1: A 'norelay' file can exist or not. when file exists it will stop all relaying.
+        Level 2: RELAY host information (3 env params) must exist
+        Level 3: RELAY_ENABLED environment param can be true/false or
+                 force (true/false) can be passed to the relay call that can override RELAY_ENABLED
+
+
     :return:
     """
     queue_utils = QueueUtils(_queue_name='test')
 
+    # test level 1, create the norelay file
+    fp = open(os.path.join(os.path.dirname(__file__), '../../', 'norelay'), 'x')
+    fp.close()
+
     # send the msg to the queue specified
-    ret_val: bool = queue_utils.relay_msg('test', False)
+    ret_val: bool = queue_utils.relay_msg(b'test')
 
     # check the result
     assert ret_val
+
+    # remove the override relay file
+    os.remove(os.path.join(os.path.dirname(__file__), '../../', 'norelay'))
+
+    # test level 2, remove one of the relay host config items
+    os.environ.pop("RELAY_RABBITMQ_HOST")
+
+    # send the msg to the queue specified
+    ret_val: bool = queue_utils.relay_msg(b'test')
+
+    # check the result
+    assert ret_val
+
+    # replace the relay host config items
+    os.environ['RELAY_RABBITMQ_HOST'] = 'invalid_host_name'
+
+    # test level 3, part 1. disable the relay, call the method with force off
+    os.environ['RELAY_ENABLED'] = 'false'
+
+    # send the msg to the queue specified
+    ret_val: bool = queue_utils.relay_msg(b'test')
+
+    # check the result
+    assert ret_val
+
+    # test level 3, part 2. this should actually let the relay occur
+    # but because of bogus relay host values this will throw an exception and return false
+    ret_val: bool = queue_utils.relay_msg(b'test', True)
+
+    # check the result
+    assert not ret_val
