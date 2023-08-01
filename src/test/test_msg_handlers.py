@@ -15,7 +15,6 @@ import json
 
 from src.common.queue_utils import QueueUtils
 from src.common.pg_impl import PGImplementation
-from src.common.asgs_constants import AsgsConstants
 from src.common.queue_callbacks import QueueCallbacks
 
 # these are the currently expected ecflow params that were transformed into ASGS legacy params
@@ -47,9 +46,6 @@ def test_insert_asgs_status_msg():
 
     :return:
     """
-    # define and init the object used to handle ASGS constant conversions
-    asgs_constants = AsgsConstants()
-
     # specify the DB to get a connection
     # note the extra comma makes this single item a singleton tuple
     db_name: tuple = ('asgs',)
@@ -58,14 +54,14 @@ def test_insert_asgs_status_msg():
     db_info = PGImplementation(db_name)
 
     # load the json
-    with open(os.path.join(os.path.dirname(__file__), 'test_asgs_status_msg.json'), encoding='UTF-8') as test_fh:
+    with open('test_asgs_status_msg.json', encoding='UTF-8') as test_fh:
         status_items = json.loads(test_fh.read())
 
     # get the state type id. lets just set this to running for this test run
-    state_id = asgs_constants.get_lu_id('RUNN', "state_type", context='test_insert_asgs_status_msg()')
+    state_id = db_info.get_lu_id('RUNN', "state_type", context='test_insert_asgs_status_msg()')
 
     # get the site id
-    site_id = asgs_constants.get_lu_id(status_items.get('physical_location'), 'site', context='test_insert_asgs_status_msg()')
+    site_id = db_info.get_lu_id(status_items.get('physical_location'), 'site', context='test_insert_asgs_status_msg()')
 
     # insert an instance record into the DB to get things primed
     instance_id = db_info.insert_instance(state_id, site_id, status_items, context='test_insert_asgs_status_msg()')
@@ -80,9 +76,6 @@ def test_insert_asgs_config_items():
 
     :return:
     """
-    # define and init the object used to handle ASGS constant conversions
-    asgs_constants = AsgsConstants()
-
     # specify the DB to get a connection
     # note the extra comma makes this single item a singleton tuple
     db_name: tuple = ('asgs',)
@@ -91,7 +84,7 @@ def test_insert_asgs_config_items():
     db_info = PGImplementation(db_name)
 
     # load the json
-    with open(os.path.join(os.path.dirname(__file__), 'test_asgs_run_props.json'), encoding='UTF-8') as test_fh:
+    with open('test_asgs_run_props.json', encoding='UTF-8') as test_fh:
         run_props = json.loads(test_fh.read())
 
     # get the param array into a dict
@@ -102,10 +95,10 @@ def test_insert_asgs_config_items():
     param_list.update({x[0]: x[1] for x in run_props['param_list']})
 
     # get the state type id. lets just set this to running for this test run
-    state_id = asgs_constants.get_lu_id('RUNN', "state_type", context='test_insert_asgs_config_items()')
+    state_id = db_info.get_lu_id('RUNN', "state_type", context='test_insert_asgs_config_items()')
 
     # get the site id
-    site_id = asgs_constants.get_lu_id(param_list.get('physical_location'), 'site', context='test_insert_asgs_config_items()')
+    site_id = db_info.get_lu_id(param_list.get('physical_location'), 'site', context='test_insert_asgs_config_items()')
 
     # insert an instance record into the DB to get things primed
     instance_id = db_info.insert_instance(state_id, site_id, param_list, context='test_insert_asgs_config_items()')
@@ -123,9 +116,6 @@ def test_insert_ecflow_config_items():
 
     :return:
     """
-    # define and init the object used to handle ASGS constant conversions
-    asgs_constants = AsgsConstants()
-
     # specify the DB to get a connection
     # note the extra comma makes this single item a singleton tuple
     db_name: tuple = ('asgs',)
@@ -137,7 +127,7 @@ def test_insert_ecflow_config_items():
     queue_utils = QueueUtils(_queue_name='')
 
     # load the json
-    with open(os.path.join(os.path.dirname(__file__), 'test_ecflow_run_props.json'), encoding='UTF-8') as test_fh:
+    with open('test_ecflow_run_props.json', encoding='UTF-8') as test_fh:
         run_props = json.loads(test_fh.read())
 
     # transform the ecflow params into addition al asgs params
@@ -150,10 +140,10 @@ def test_insert_ecflow_config_items():
     assert ret_val == run_props
 
     # get the state type id. lets just set this to running for this test run
-    state_id = asgs_constants.get_lu_id('RUNN', "state_type", context='test_insert_ecflow_config_items()')
+    state_id = db_info.get_lu_id('RUNN', "state_type", context='test_insert_ecflow_config_items()')
 
     # get the site id
-    site_id = asgs_constants.get_lu_id(run_props.get('suite.physical_location'), 'site', context='test_insert_ecflow_config_items()')
+    site_id = db_info.get_lu_id(run_props.get('suite.physical_location'), 'site', context='test_insert_ecflow_config_items()')
 
     # insert an instance record into the DB to get things primed
     instance_id = db_info.insert_instance(state_id, site_id, run_props, context='test_insert_ecflow_config_items()')
@@ -174,9 +164,6 @@ def test_insert_hecras_config_items():
 
     :return:
     """
-    # define and init the object used to handle ASGS constant conversions
-    asgs_constants = AsgsConstants()
-
     # specify the DB to get a connection
     # note the extra comma makes this single item a singleton tuple
     db_name: tuple = ('asgs',)
@@ -188,7 +175,7 @@ def test_insert_hecras_config_items():
     queue_utils = QueueUtils(_queue_name='')
 
     # load the json
-    with open(os.path.join(os.path.dirname(__file__), 'test_hecras_run_props.json'), encoding='UTF-8') as test_fh:
+    with open('test_hecras_run_props.json', encoding='UTF-8') as test_fh:
         run_props = json.loads(test_fh.read())
 
     # transform the ecflow params into addition al asgs params
@@ -201,10 +188,10 @@ def test_insert_hecras_config_items():
     assert ret_val == run_props
 
     # get the state type id. lets just set this to running for this test run
-    state_id = asgs_constants.get_lu_id('RUNN', "state_type", context='test_insert_hecras_config_items()')
+    state_id = db_info.get_lu_id('RUNN', "state_type", context='test_insert_hecras_config_items()')
 
     # get the site id
-    site_id = asgs_constants.get_lu_id(run_props.get('suite.physical_location'), 'site', context='test_insert_hecras_config_items()')
+    site_id = db_info.get_lu_id(run_props.get('suite.physical_location'), 'site', context='test_insert_hecras_config_items()')
 
     # insert an instance record into the DB to get things primed
     instance_id = db_info.insert_instance(state_id, site_id, run_props, context='test_insert_hecras_config_items()')
@@ -226,7 +213,7 @@ def test_ecflow_run_time_queue_callback():
     :return:
     """
     # load the json
-    with open(os.path.join(os.path.dirname(__file__), 'test_ecflow_uga_rt_msg.json'), encoding='UTF-8') as test_fh:
+    with open('test_ecflow_uga_rt_msg.json', encoding='UTF-8') as test_fh:
         msg = test_fh.readline()
 
     # instantiate the utility class
@@ -246,7 +233,7 @@ def test_ecflow_run_props_queue_callback():
     :return:
     """
     # load the json
-    with open(os.path.join(os.path.dirname(__file__), 'test_new_run_props_msg.json'), encoding='UTF-8') as test_fh:
+    with open('test_new_run_props_msg.json', encoding='UTF-8') as test_fh:
         msg = test_fh.readline()
 
     # instantiate the utility class
@@ -266,7 +253,7 @@ def test_hecras_queue_callback():
     :return:
     """
     # load the json
-    with open(os.path.join(os.path.dirname(__file__), 'test_hecras_run_props.json'), encoding='UTF-8') as test_fh:
+    with open('test_hecras_run_props.json', encoding='UTF-8') as test_fh:
         msg = test_fh.readline()
 
     # instantiate the utility class

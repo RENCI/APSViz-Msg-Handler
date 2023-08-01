@@ -30,7 +30,7 @@ def test_asgs_legacy_extender():
     # for each set of test data
     for test_datum in test_data:
         # load the test json
-        with open(os.path.join(os.path.dirname(__file__), test_datum[0]), encoding='UTF-8') as test_fh:
+        with open(test_datum[0], encoding='UTF-8') as test_fh:
             # load the json
             run_props = json.loads(test_fh.read())
 
@@ -93,8 +93,8 @@ def test_relay():
     """
     queue_utils = QueueUtils(_queue_name='test')
 
-    # test level 1, create the norelay file
-    with open(os.path.join(os.path.dirname(__file__), '../../', 'norelay'), 'x', encoding='UTF-8') as f_p:
+    # test level 1, create the no-relay file
+    with open(os.path.join('../../', 'norelay'), 'x', encoding='UTF-8') as f_p:
         f_p.close()
 
     # send the msg to the queue specified
@@ -104,7 +104,7 @@ def test_relay():
     assert ret_val
 
     # remove the override relay file
-    os.remove(os.path.join(os.path.dirname(__file__), '../../', 'norelay'))
+    os.remove(os.path.join('../../', 'norelay'))
 
     # test level 2, remove one of the relay host config items
     os.environ.pop("RELAY_RABBITMQ_HOST")

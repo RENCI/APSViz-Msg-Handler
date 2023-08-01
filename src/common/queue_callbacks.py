@@ -16,7 +16,6 @@ from src.common.logger import LoggingUtil
 from src.common.pg_impl import PGImplementation
 from src.common.general_utils import GeneralUtils
 from src.common.queue_utils import QueueUtils
-from src.common.asgs_constants import AsgsConstants
 
 
 class QueueCallbacks:
@@ -44,9 +43,6 @@ class QueueCallbacks:
             self.logger = LoggingUtil.init_logging("APSVIZ.Msg-Handler.QueueCallbacks", level=log_level, line_format='medium', log_file_path=log_path)
 
         self.logger.info("Initializing QueueCallback for queue %s", _queue_name)
-
-        # define and init the object used to handle ASGS constant conversions
-        self.asgs_constants = AsgsConstants(_logger=self.logger)
 
         # specify the DB to get a connection to
         # note the extra comma makes this single item a singleton tuple
@@ -89,13 +85,13 @@ class QueueCallbacks:
             msg_obj: json = json.loads(body)
 
             # get the site id from the name in the message
-            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
+            site_id = self.db_info.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
 
             # get the 3vent type if from the event name in the message
-            event_type_id, event_name = self.asgs_constants.get_lu_id_from_msg(msg_obj, "event_type", "event_type", context=context)
+            event_type_id, event_name = self.db_info.get_lu_id_from_msg(msg_obj, "event_type", "event_type", context=context)
 
             # get the event type if from the event name in the message
-            state_id, state_name = self.asgs_constants.get_lu_id_from_msg(msg_obj, "state", "state_type", context=context)
+            state_id, state_name = self.db_info.get_lu_id_from_msg(msg_obj, "state", "state_type", context=context)
 
             # get the event advisory data
             advisory_id = msg_obj.get("advisory_number", "N/A") if (msg_obj.get("advisory_number", "N/A") != "") else "N/A"
@@ -225,7 +221,7 @@ class QueueCallbacks:
             msg_obj: json = json.loads(body)
 
             # get the site id from the name in the message
-            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
+            site_id = self.db_info.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
 
             # insure we have a legit location
             if site_id is None or site_id[0] < 0:
@@ -242,7 +238,7 @@ class QueueCallbacks:
                 self.logger.debug("site_id: %s, context: %s", str(site_id), context)
 
                 # filter out handing - accept runs for all locations, except UCF and George Mason runs for now
-                site_ids = self.asgs_constants.get_site_ids(context=context)
+                site_ids = self.db_info.get_site_ids(context=context)
 
                 # init the instance id
                 instance_id: int = 0
@@ -362,13 +358,13 @@ class QueueCallbacks:
             msg_obj = json.loads(body)
 
             # get the site id from the name in the message
-            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
+            site_id = self.db_info.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
 
             # get the 3vent type if from the event name in the message
-            event_type_id, event_name = self.asgs_constants.get_lu_id_from_msg(msg_obj, "event_type", "event_type", context=context)
+            event_type_id, event_name = self.db_info.get_lu_id_from_msg(msg_obj, "event_type", "event_type", context=context)
 
             # get the event type if from the event name in the message
-            state_id, state_name = self.asgs_constants.get_lu_id_from_msg(msg_obj, "state", "state_type", context=context)
+            state_id, state_name = self.db_info.get_lu_id_from_msg(msg_obj, "state", "state_type", context=context)
 
             # get the event advisory data
             advisory_id = msg_obj.get("advisory_number", "N/A") if (msg_obj.get("advisory_number", "N/A") != "") else "N/A"
@@ -509,7 +505,7 @@ class QueueCallbacks:
             msg_obj = self.queue_utils.extend_msg_to_asgs_legacy(msg_obj)
 
             # get the site id from the name in the message
-            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
+            site_id = self.db_info.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
 
             # insure we have a legit location
             if site_id is None or site_id[0] < 0:
@@ -528,7 +524,7 @@ class QueueCallbacks:
                 self.logger.debug("site_id: %s, context: %s", str(site_id), context)
 
                 # filter out handing - accept runs for all locations, except UCF and George Mason runs for now
-                site_ids = self.asgs_constants.get_site_ids(context=context)
+                site_ids = self.db_info.get_site_ids(context=context)
 
                 # init the instance id
                 instance_id: int = 0
@@ -638,7 +634,7 @@ class QueueCallbacks:
             msg_obj = self.queue_utils.extend_msg_to_asgs_legacy(msg_obj)
 
             # get the site id from the name in the message
-            site_id = self.asgs_constants.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
+            site_id = self.db_info.get_lu_id_from_msg(msg_obj, "physical_location", "site", context=context)
 
             # insure we have a legit location
             if site_id is None or site_id[0] < 0:
@@ -657,7 +653,7 @@ class QueueCallbacks:
                 self.logger.debug("site_id: %s, context: %s", str(site_id), context)
 
                 # filter out handing - accept runs for all locations, except UCF and George Mason runs for now
-                site_ids = self.asgs_constants.get_site_ids(context=context)
+                site_ids = self.db_info.get_site_ids(context=context)
 
                 # init the instance id
                 instance_id: int = 0

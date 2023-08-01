@@ -14,7 +14,6 @@ import datetime
 
 from src.common.pg_utils_multi import PGUtilsMultiConnect
 from src.common.logger import LoggingUtil
-from src.common.asgs_constants import AsgsConstants
 from src.common.queue_utils import QueueUtils
 
 
@@ -39,14 +38,14 @@ class PGImplementation(PGUtilsMultiConnect):
             self.logger = LoggingUtil.init_logging("APSViz.Msg-Handler.PGImplementation", level=log_level, line_format='medium',
                                                    log_file_path=log_path)
 
-        # get the ASGS constants
-        self.asgs_constants = AsgsConstants(_logger=self.logger)
-
         # create the general queue utilities class
         self.queue_utils = QueueUtils(_queue_name='', _logger=self.logger)
 
         # init the base class
         PGUtilsMultiConnect.__init__(self, 'APSViz.Settings', db_names, _logger=self.logger, _auto_commit=_auto_commit)
+
+        # load the ASGS constants into memory
+        self.asgs_constants = self.build_asgs_constants()
 
     def __del__(self):
         """
@@ -56,6 +55,103 @@ class PGImplementation(PGUtilsMultiConnect):
         """
         # clean up connections and cursors
         PGUtilsMultiConnect.__del__(self)
+
+    def build_asgs_constants(self) -> dict:
+        # create a list of target lu tables
+        lu_tables = ['ASGS_Mon_site_lu', 'ASGS_Mon_event_type_lu', 'ASGS_Mon_state_type_lu', 'ASGS_Mon_instance_state_type_lu']
+
+        # init the lu_data storage
+        lu_data: dict = {}
+
+        # make the call to get the data
+        for lu_item in lu_tables:
+            lu_data.update({lu_item.removeprefix('ASGS_Mon_').removesuffix('_lu'): self.get_lu_items(lu_item)})
+
+        # add in the pct_complete items
+        lu_data.update(
+            {'pct_complete': {'0': 0, '1': 5, '2': 20, '3': 40, '4': 60, '5': 90, '6': 100, '7': 0, '8': 0, '9': 0, '10': 40, '11': 90, '12': 20}})
+
+        # return the data
+        return lu_data
+
+    def get_lu_items(self, lu_name: str):
+        """
+        gets the lookup items for the table name passed.
+
+        :param lu_name:
+        :return:
+        """
+        # init the return value
+        ret_val = None
+
+        # create the sql to call the stored function
+        sql_stmt = f"SELECT * FROM public.get_lu_items(lu_name := '{lu_name}')"
+
+        # get the data
+        lu_data = self.exec_sql('asgs', sql_stmt)
+
+        # check the return
+        if lu_data != -1:
+            # assign the json object to the return
+            ret_val = lu_data
+
+        # return to the caller
+        return lu_data
+
+    def get_lu_id_from_msg(self, msg_obj, param_name: str, lu_name: str, context: str = 'unknown'):
+        """
+        gets the lookup entry for the param/type passed.
+
+        :param msg_obj:
+        :param param_name:
+        :param lu_name:
+        :param context:
+        :return:
+        """
+        # get the name
+        ret_name = msg_obj.get(param_name, "")
+
+        # get the ID
+        ret_id = self.get_lu_id(ret_name, lu_name, context)
+
+        # did we find something
+        if ret_id >= 0:
+            self.logger.debug("PASS - LU name: %s, Param name: %s, ID: %s, context: %s", lu_name, param_name, str(ret_id), context)
+        else:
+            self.logger.error("FAILURE - Invalid or no param name: %s not found in: %s, context: %s", param_name, lu_name, context)
+
+        # return to the caller
+        return ret_id, ret_name
+
+    def get_lu_id(self, element_name, lu_name, context: str = 'unknown'):
+        """
+        gets the id from a lookup table
+
+        :param element_name:
+        :param lu_name:
+        :param context:
+        :return:
+        """
+        # get the ID
+        ret_id = self.asgs_constants[lu_name].get(element_name, -1)
+
+        # did we find something
+        if ret_id >= 0:
+            self.logger.debug("PASS - LU name: %s, element name: %s, ID: %s, context: %s", lu_name, element_name, str(ret_id), context)
+        else:
+            self.logger.error("FAILURE - Invalid or no element name: %s not found in: %s, context: %s", element_name, lu_name, context)
+
+        # return to the caller
+        return ret_id
+
+    def get_site_ids(self, context='unknown') -> list:
+        """
+        gets the list of site ids for the ASGS run properties message handler
+
+        :return:
+        """
+        # return the list of ids
+        return [value for key, value in self.asgs_constants['site'].items()]
 
     def get_existing_event_group_id(self, instance_id, advisory_id, context: str = 'unknown'):
         """
@@ -236,7 +332,7 @@ class PGImplementation(PGUtilsMultiConnect):
         process = msg_obj.get("process", "N/A") if (msg_obj.get("process", "N/A") != "") else "N/A"
 
         # get the percent complete from a LU lookup
-        pct_complete = self.asgs_constants.get_lu_id(str(event_type_id), "pct_complete", context)
+        pct_complete = self.get_lu_id(str(event_type_id), "pct_complete", context)
 
         # get the sub percent complete from the message object
         sub_pct_complete = msg_obj.get("subpctcomplete", pct_complete)

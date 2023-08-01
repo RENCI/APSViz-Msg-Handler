@@ -14,7 +14,6 @@ import os
 from enum import Enum
 
 import pika
-from src.common.asgs_constants import AsgsConstants
 from src.common.logger import LoggingUtil
 
 
@@ -72,9 +71,6 @@ class QueueUtils:
                                      'forcing.tropicalcyclone.stormname': ReformatType.UPPERCASE}
         # save the queue name
         self.queue_name = _queue_name
-
-        # define and init the object used to handle ASGS constant conversions
-        self.asgs_constants_inst = AsgsConstants(_logger=self.logger)
 
     def start_consuming(self, callback):
         """
