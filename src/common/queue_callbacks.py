@@ -238,7 +238,7 @@ class QueueCallbacks:
                 self.logger.debug("site_id: %s, context: %s", str(site_id), context)
 
                 # filter out handing - accept runs for all locations, except UCF and George Mason runs for now
-                site_ids = self.db_info.get_site_ids(context=context)
+                site_ids: list = self.db_info.get_site_ids()
 
                 # init the instance id
                 instance_id: int = 0
@@ -524,7 +524,7 @@ class QueueCallbacks:
                 self.logger.debug("site_id: %s, context: %s", str(site_id), context)
 
                 # filter out handing - accept runs for all locations, except UCF and George Mason runs for now
-                site_ids = self.db_info.get_site_ids(context=context)
+                site_ids: list = self.db_info.get_site_ids()
 
                 # init the instance id
                 instance_id: int = 0
@@ -653,7 +653,7 @@ class QueueCallbacks:
                 self.logger.debug("site_id: %s, context: %s", str(site_id), context)
 
                 # filter out handing - accept runs for all locations, except UCF and George Mason runs for now
-                site_ids = self.db_info.get_site_ids(context=context)
+                site_ids: list = self.db_info.get_site_ids()
 
                 # init the instance id
                 instance_id: int = 0

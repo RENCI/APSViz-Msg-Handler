@@ -5,6 +5,10 @@
 # SPDX-License-Identifier: LicenseRef-RENCI
 # SPDX-License-Identifier: MIT
 
+"""
+    Tests to interrogate database operations
+
+"""
 from src.common.pg_impl import PGImplementation
 
 
@@ -31,6 +35,11 @@ def test_db_connection_creation():
 
 
 def test_get_lu_id():
+    """
+    Tests the retrieval of LU data for sites
+
+    :return:
+    """
     # create the DB object
     db_names: tuple = ('asgs',)
 
@@ -41,16 +50,21 @@ def test_get_lu_id():
     site_id = db_info.get_lu_id('RENCI', 'site')
 
     # the renci site has an id of 0
-    assert id != 0
+    assert site_id == 0
 
     # get a site id item
     site_id = db_info.get_lu_id('TWI', 'site')
 
     # the twi site has an id of 12
-    assert id != 0
+    assert site_id == 12
 
 
 def test_get_site_ids():
+    """
+    Tests the retrieval of a list of site IDs
+
+    :return:
+    """
     # create the DB object
     db_names: tuple = ('asgs',)
 
@@ -65,6 +79,11 @@ def test_get_site_ids():
 
 
 def test_load_lu_data():
+    """
+    Tests the retrieval of lookup data
+
+    :return:
+    """
     # create the DB object
     db_names: tuple = ('asgs',)
 

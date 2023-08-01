@@ -57,6 +57,11 @@ class PGImplementation(PGUtilsMultiConnect):
         PGUtilsMultiConnect.__del__(self)
 
     def build_asgs_constants(self) -> dict:
+        """
+        builds the in-memory data for asgs constants.
+
+        :return:
+        """
         # create a list of target lu tables
         lu_tables = ['ASGS_Mon_site_lu', 'ASGS_Mon_event_type_lu', 'ASGS_Mon_state_type_lu', 'ASGS_Mon_instance_state_type_lu']
 
@@ -96,7 +101,7 @@ class PGImplementation(PGUtilsMultiConnect):
             ret_val = lu_data
 
         # return to the caller
-        return lu_data
+        return ret_val
 
     def get_lu_id_from_msg(self, msg_obj, param_name: str, lu_name: str, context: str = 'unknown'):
         """
@@ -144,7 +149,7 @@ class PGImplementation(PGUtilsMultiConnect):
         # return to the caller
         return ret_id
 
-    def get_site_ids(self, context='unknown') -> list:
+    def get_site_ids(self) -> list:
         """
         gets the list of site ids for the ASGS run properties message handler
 

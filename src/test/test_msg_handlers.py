@@ -10,7 +10,7 @@
 
     Authors: Lisa Stillwell, Phil Owen @RENCI.org
 """
-import os
+
 import json
 
 from src.common.queue_utils import QueueUtils
