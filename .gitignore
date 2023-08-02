@@ -6,3 +6,4 @@
 # SPDX-License-Identifier: MIT
 
 /src/test/.pytest_cache/
+/src/common/APSViz.Msg-Handler.PGImplementation.log
