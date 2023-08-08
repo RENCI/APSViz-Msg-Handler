@@ -183,7 +183,7 @@ class QueueUtils:
                         channel.basic_publish(exchange='', routing_key=self.queue_name, body=body)
 
                     except Exception:
-                        self.logger.error("Error: Exception relaying message to queue: %s.", self.queue_name)
+                        self.logger.exception("Error: Exception relaying message to queue: %s.", self.queue_name)
 
                         # set the return status to fail
                         ret_val = False
