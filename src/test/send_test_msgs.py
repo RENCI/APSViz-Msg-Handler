@@ -40,7 +40,7 @@ if __name__ == '__main__':
             msg_obj: str = line
 
             # send the msg to the queue specified
-            queue_utils.relay_msg(msg_obj, True)
+            queue_utils.relay_msg(str.encode(msg_obj), True)
 
             # something for the user
             print(msg_obj)
