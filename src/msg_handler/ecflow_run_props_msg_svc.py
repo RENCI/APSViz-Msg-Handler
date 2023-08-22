@@ -36,14 +36,21 @@ def run():
     logger.info("Initializing ecflow_run_props_msg_svc handler, version: %s.", app_version)
 
     try:
-        # get a reference to the common callback handler
-        queue_callback = QueueCallbacks(_queue_name='ecflow_rp', _logger=logger)
+        # get the queue name
+        queue_name: str = os.getenv('ECFLOW_RP_QUEUE_NAME', None)
 
-        # get a reference to the common queue utilities
-        queue_utils = QueueUtils(_queue_name='ecflow_rp', _logger=logger)
+        # did we get a queue name
+        if queue_name is not None:
+            # get a reference to the common callback handler
+            queue_callback = QueueCallbacks(_queue_name=queue_name, _logger=logger)
 
-        # start consuming the messages
-        queue_utils.start_consuming(queue_callback.ecflow_run_props_callback)
+            # get a reference to the common queue utilities
+            queue_utils = QueueUtils(_queue_name=queue_name, _logger=logger)
+
+            # start consuming the messages
+            queue_utils.start_consuming(queue_callback.ecflow_run_props_callback)
+        else:
+            logger.error('FAILURE - ECFLOW run property queue name not specified. Queue handling not started.')
 
     except Exception:
         logger.exception("FAILURE - Problems initiating ecflow_run_props_msg_svc.")

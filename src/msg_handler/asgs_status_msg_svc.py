@@ -35,14 +35,21 @@ def run():
     logger.info("Initializing asgs_status_msg_svc handler, version: %s.", app_version)
 
     try:
-        # get an instance to the callback handler
-        queue_callback = QueueCallbacks(_queue_name='asgs_queue', _logger=logger)
+        # get the queue name
+        queue_name: str = os.getenv('ASGS_RT_QUEUE_NAME', None)
 
-        # get a reference to the common queue utilities
-        queue_utils = QueueUtils(_queue_name='asgs_queue', _logger=logger)
+        # did we get a queue name
+        if queue_name is not None:
+            # get an instance to the callback handler
+            queue_callback = QueueCallbacks(_queue_name=queue_name, _logger=logger)
 
-        # start consuming the messages
-        queue_utils.start_consuming(queue_callback.asgs_status_msg_callback)
+            # get a reference to the common queue utilities
+            queue_utils = QueueUtils(_queue_name=queue_name, _logger=logger)
+
+            # start consuming the messages
+            queue_utils.start_consuming(queue_callback.asgs_status_msg_callback)
+        else:
+            logger.error('FAILURE - ASGS runtime status queue name not specified. Queue handling not started.')
 
     except Exception:
         logger.exception("FAILURE - Problems initializing asgs_status_msg_svc.")
