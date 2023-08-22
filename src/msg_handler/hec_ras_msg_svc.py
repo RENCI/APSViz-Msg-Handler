@@ -37,10 +37,10 @@ def run():
 
     try:
         # get a reference to the common callback handler
-        queue_callback = QueueCallbacks(_queue_name='hec_ras_queue', _logger=logger)
+        queue_callback = QueueCallbacks(_queue_name='hecras_rp', _logger=logger)
 
         # get a reference to the common queue utilities
-        queue_utils = QueueUtils(_queue_name='hec_ras_queue', _logger=logger)
+        queue_utils = QueueUtils(_queue_name='hecras_rp', _logger=logger)
 
         # start consuming the messages
         queue_utils.start_consuming(queue_callback.hecras_run_props_callback)
