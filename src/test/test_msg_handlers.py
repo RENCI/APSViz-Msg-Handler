@@ -12,6 +12,7 @@
 """
 
 import json
+import csv
 
 from src.common.queue_utils import QueueUtils
 from src.common.pg_impl import PGImplementation
@@ -252,15 +253,34 @@ def test_hecras_queue_callback():
 
     :return:
     """
-    # load the json
-    with open('test_hecras_run_props.json', encoding='UTF-8') as test_fh:
-        msg = test_fh.readline()
+
+    # init the file name test_hecras_run_props.json
+    file_name: str = 'hecras-process-id-group-test.csv'
+
+    # load the file
+    with open(file_name, encoding='UTF-8') as test_fh:
+        # if the file is not json
+        if file_name.find('.json') == -1:
+            # read the csv file
+            csv_reader: csv.reader = csv.reader(test_fh)
+
+            # skip by the header record
+            next(csv_reader)
+
+            # create the new dict
+            csv_dict: dict = {x[0]: x[1] for x in csv_reader}
+
+            # convert the dict to a json string
+            msg: str = json.dumps(csv_dict)
+        else:
+            # just read the line of json
+            msg: str = test_fh.readline()
 
     # instantiate the utility class
-    queue_callback = QueueCallbacks(_queue_name='')
+    queue_callback: QueueCallbacks = QueueCallbacks(_queue_name='')
 
     # call the msg handler callback
-    success = queue_callback.hecras_run_props_callback(None, None, None, msg)
+    success: bool = queue_callback.hecras_run_props_callback(None, None, None, msg)
 
     # check for pass/fail
     assert success is True
