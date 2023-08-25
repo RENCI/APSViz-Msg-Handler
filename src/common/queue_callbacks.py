@@ -671,7 +671,7 @@ class QueueCallbacks:
                         msg_obj.update({'workflow_type': 'HECRAS', 'supervisor_job_status': 'new'})
 
                         # insert the records
-                        err_msg: str = self.db_info.insert_config_items(instance_id, msg_obj)
+                        err_msg: str = self.db_info.insert_config_items(instance_id, msg_obj, '-HECRAS')
 
                         # was there a problem
                         if err_msg is not None:

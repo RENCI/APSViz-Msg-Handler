@@ -439,10 +439,11 @@ class PGImplementation(PGUtilsMultiConnect):
 
         return instance_id
 
-    def insert_config_items(self, instance_id: int, params: dict):
+    def insert_config_items(self, instance_id: int, params: dict, suffix: str = None):
         """
         Inserts the configuration parameters into the database
 
+        :param suffix:
         :param instance_id:
         :param params:
         :return:
@@ -469,8 +470,8 @@ class PGImplementation(PGUtilsMultiConnect):
                 ret_msg = "Error: 'advisory' and/or 'enstorm' parameters not found."
                 self.logger.error(ret_msg)
             else:
-                # build up the unique ID
-                uid = str(advisory) + "-" + str(enstorm)
+                # build up the unique ID. note certain runs (like HECRAS) will have a suffix
+                uid = str(advisory) + "-" + str(enstorm) + suffix
 
                 self.logger.debug("uid: %s", uid)
 
