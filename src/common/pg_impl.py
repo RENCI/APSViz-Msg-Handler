@@ -439,7 +439,7 @@ class PGImplementation(PGUtilsMultiConnect):
 
         return instance_id
 
-    def insert_config_items(self, instance_id: int, params: dict, suffix: str = None):
+    def insert_config_items(self, instance_id: int, params: dict, suffix: str = ''):
         """
         Inserts the configuration parameters into the database
 
