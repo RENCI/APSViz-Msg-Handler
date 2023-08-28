@@ -28,6 +28,7 @@ class ReformatType(int, Enum):
     INTEGER = 4
     FLOAT = 5
     STRING = 6
+    MAKE_INT = 7
 
 
 class QueueUtils:
@@ -66,8 +67,8 @@ class QueueUtils:
                                   'forcing.vortexmodel': ['forcing.tropicalcyclone.vortexmodel']}
 
         # declare param transformation selections
-        self.msg_transform_params = {'forcing.stormnumber': ReformatType.INTEGER, 'storm': ReformatType.INTEGER, 'stormnumber': ReformatType.INTEGER,
-                                     'forcing.stormname':  ReformatType.UPPERCASE, 'stormname': ReformatType.UPPERCASE,
+        self.msg_transform_params = {'storm': ReformatType.INTEGER, 'stormnumber': ReformatType.MAKE_INT,
+                                     'forcing.stormname': ReformatType.UPPERCASE, 'stormname': ReformatType.UPPERCASE,
                                      'forcing.tropicalcyclone.stormname': ReformatType.UPPERCASE}
         # save the queue name
         self.queue_name = _queue_name
@@ -263,6 +264,16 @@ class QueueUtils:
                             case ReformatType.STRING:
                                 # make the conversion
                                 ret_val.update({key: str(param)})
+                            case ReformatType.MAKE_INT:
+                                # strip off all non-numeric characters
+                                val = "".join(n for n in param if n.isnumeric())
+
+                                # check to see if a number is left. if so, pad it
+                                if val.isnumeric():
+                                    ret_val.update({key: val.rjust(2, '0')})
+                                # else this is not a number
+                                else:
+                                    ret_val.update({key: 'NaN'})
                             case _:
                                 self.logger.error("Invalid conversion type found.")
                 except Exception:

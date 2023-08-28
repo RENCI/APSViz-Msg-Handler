@@ -54,12 +54,12 @@ def test_transform_msg_params():
     :return:
     """
     # add in some test cases to transform
-    test_params: dict = {'forcing.stormnumber': '03', 'stormnumber': 'no_change', 'storm': "1.5e10", 'stormname': 'LOWerCase',
+    test_params: dict = {'forcing.stormnumber': 'not a num', 'stormnumber': 'al03', 'storm': "1.5e10", 'stormname': 'LOWerCase',
                          'forcing.stormname': 'UPPERcase', 'forcing.tropicalcyclone.stormname': 'sentenceCASE', 'nokey': 'no_change',
                          'physical_location': 'no_change'}
 
     # create a dict of the expected transformations
-    expected_params: dict = {'forcing.stormnumber': '3', 'stormnumber': 'no_change', 'storm': "15000000000.0", 'stormname': 'lowercase',
+    expected_params: dict = {'forcing.stormnumber': 'NaN', 'stormnumber': '03', 'storm': "15000000000.0", 'stormname': 'lowercase',
                              'forcing.stormname': 'UPPERCASE', 'forcing.tropicalcyclone.stormname': 'Sentencecase', 'nokey': 'no_change',
                              'physical_location': 'no_change'}
 
@@ -67,9 +67,9 @@ def test_transform_msg_params():
     queue_utils = QueueUtils(_queue_name='')
 
     # make up some tests
-    queue_utils.msg_transform_params = {'forcing.stormnumber': ReformatType.INTEGER, 'storm': ReformatType.FLOAT, 'stormnumber': ReformatType.STRING,
-                                        'forcing.stormname': ReformatType.UPPERCASE, 'stormname': ReformatType.LOWERCASE,
-                                        'forcing.tropicalcyclone.stormname': ReformatType.SENTENCE_CASE}
+    queue_utils.msg_transform_params = {'forcing.stormnumber': ReformatType.MAKE_INT, 'storm': ReformatType.FLOAT,
+                                        'stormname': ReformatType.LOWERCASE, 'stormnumber': ReformatType.MAKE_INT,
+                                        'forcing.stormname': ReformatType.UPPERCASE, 'forcing.tropicalcyclone.stormname': ReformatType.SENTENCE_CASE}
 
     # get the transformed list
     ret_val = queue_utils.transform_msg_params(test_params)
