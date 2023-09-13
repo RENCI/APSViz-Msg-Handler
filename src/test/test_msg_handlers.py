@@ -24,18 +24,17 @@ ecflow_expected_transformed_params: dict = {'physical_location': 'RENCI', 'monit
                                             'currentdate': '230206', 'currentcycle': '12', 'advisory': '2023030112', 'asgs.enstorm': 'gfsforecast',
                                             'enstorm': 'gfsforecast', 'stormname': 'none', 'forcing.tropicalcyclone.stormname': 'none',
                                             'config.coupling.waves': '0', 'forcing.tropicalcyclone.vortexmodel': 'NA',
-                                            'downloadurl':
-                                                'https://localhost/thredds/fileServer/2023/gfs/2023020612/ec95d/ht-ncfs.renci.org/ec95d/gfsforecast'}
+                                            'downloadurl': 'https://localhost/thredds/fileServer/2023/gfs/2023020612/ec95d/ht-ncfs.renci.org/ec95d/gfsforecast'}
 
 # these are the currently expected hecras params that were transformed into ASGS legacy params
 hecras_expected_transformed_params: dict = {'ADCIRCgrid': 'ec95d', 'adcirc.gridname': 'ec95d', 'advisory': '2023030112',
                                             'asgs.enstorm': 'gfsforecast', 'config.coupling.waves': '0', 'currentcycle': '06',
-                                            'currentdate': '230206', 'downloadurl': 'https://hecrastest.com/max_wse.tif', 'enstorm': 'gfsforecast',
+                                            'currentdate': '230206', 'downloadurl': 'http://hecrastest.com/max_wse.tif', 'enstorm': 'gfsforecast',
                                             'forcing.advisory': '2023030112', 'forcing.ensemblename': 'gfsforecast', 'forcing.metclass': 'synoptic',
                                             'forcing.stormname': None, 'forcing.tropicalcyclone.stormname': None,
                                             'forcing.tropicalcyclone.vortexmodel': 'NA', 'forcing.vortexmodel': 'NA', 'forcing.waves': '0',
                                             'instance_name': 'ec95d', 'instancename': 'ec95d', 'monitoring.rmqmessaging.locationname': 'RENCI',
-                                            'output.downloadurl': 'https://hecrastest.com/max_wse.tif', 'physical_location': 'RENCI',
+                                            'output.downloadurl': 'http://hecrastest.com/max_wse.tif', 'physical_location': 'RENCI',
                                             'stormname': None, 'suite.adcirc.gridname': 'ec95d', 'suite.instance_name': 'ec95d',
                                             'suite.physical_location': 'RENCI', 'suite.project_code': 'hecras_test_renci', 'suite.uid': '94836645',
                                             'time.currentcycle': '06', 'time.currentdate': '230206', 'uid': '94836645'}
@@ -84,13 +83,17 @@ def test_insert_asgs_config_items():
     # define and init the object that will handle ASGS DB operations
     db_info = PGImplementation(db_name)
 
+    # instantiate the utility class
+    queue_utils = QueueUtils(_queue_name='')
+
     # load the json
     with open('test_asgs_run_props.json', encoding='UTF-8') as test_fh:
         run_props = json.loads(test_fh.read())
 
     # get the param array into a dict
     param_list: dict = {'physical_location': run_props['physical_location'], 'uid': run_props['uid'], 'instance_name': run_props['instance_name'],
-                        'workflow_type': 'ASGS', 'supervisor_job_status': 'debug', 'product_type': 'asgs'}
+                        'workflow_type': 'ASGS', 'supervisor_job_status': 'debug', 'product_type': 'asgs',
+                        'insertion_date': queue_utils.get_formatted_date()}
 
     # convert the asgs object into a single dict (like ecflow and hecras)
     param_list.update({x[0]: x[1] for x in run_props['param_list']})
@@ -150,7 +153,7 @@ def test_insert_ecflow_config_items():
     instance_id = db_info.insert_instance(state_id, site_id, run_props, context='test_insert_ecflow_config_items()')
 
     # make sure we are in debug mode and have a workflow type
-    run_props.update({'workflow_type': 'ECFLOW', 'supervisor_job_status': 'debug'})
+    run_props.update({'workflow_type': 'ECFLOW', 'supervisor_job_status': 'debug', 'insertion_date': queue_utils.get_formatted_date()})
 
     # insert the run params into the DB
     ret_val = db_info.insert_config_items(instance_id, run_props)
@@ -198,7 +201,7 @@ def test_insert_hecras_config_items():
     instance_id = db_info.insert_instance(state_id, site_id, run_props, context='test_insert_hecras_config_items()')
 
     # make sure we are in debug mode and have a workflow type
-    run_props.update({'workflow_type': 'HECRAS', 'supervisor_job_status': 'debug'})
+    run_props.update({'workflow_type': 'HECRAS', 'supervisor_job_status': 'debug', 'insertion_date': queue_utils.get_formatted_date()})
 
     # insert the run params into the DB
     ret_val = db_info.insert_config_items(instance_id, run_props)
