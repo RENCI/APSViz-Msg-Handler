@@ -255,7 +255,7 @@ class QueueCallbacks:
                         # add in the high level params
                         param_list: dict = {'physical_location': msg_obj['physical_location'], 'uid': msg_obj['uid'],
                                             'instance_name': msg_obj['instance_name'], 'workflow_type': 'ASGS', 'supervisor_job_status': 'new',
-                                            'product_code': 'asgs'}
+                                            'product_code': 'asgs', 'insertion_date': self.queue_utils.get_formatted_date()}
 
                         # convert the asgs object into a single dict (like ecflow and hecras)
                         param_list.update({x[0]: x[1] for x in msg_obj['param_list']})
@@ -538,8 +538,9 @@ class QueueCallbacks:
 
                     # we must have an existing instance id
                     if instance_id > 0:
-                        # add params for the workflow type and supervisor startup flag
-                        msg_obj.update({'workflow_type': 'ECFLOW', 'supervisor_job_status': 'new'})
+                        # add params for the workflow type, supervisor startup flag and the insertion timestamp of this queue
+                        msg_obj.update(
+                            {'workflow_type': 'ECFLOW', 'supervisor_job_status': 'new', 'insertion_date': self.queue_utils.get_formatted_date()})
 
                         # insert the records
                         err_msg: str = self.db_info.insert_config_items(instance_id, msg_obj)
@@ -667,8 +668,9 @@ class QueueCallbacks:
 
                     # we must have an existing instance id
                     if instance_id > 0:
-                        # add params for the workflow type and supervisor startup flag
-                        msg_obj.update({'workflow_type': 'HECRAS', 'supervisor_job_status': 'new'})
+                        # add params for the workflow type, supervisor startup flag and the insertion timestamp of this queue message
+                        msg_obj.update(
+                            {'workflow_type': 'HECRAS', 'supervisor_job_status': 'new', 'insertion_date': self.queue_utils.get_formatted_date()})
 
                         # insert the records
                         err_msg: str = self.db_info.insert_config_items(instance_id, msg_obj, '-HECRAS')
