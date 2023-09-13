@@ -10,6 +10,7 @@
 
     Authors: Lisa Stillwell, Phil Owen @RENCI.org
 """
+import datetime
 import os
 from enum import Enum
 
@@ -282,3 +283,19 @@ class QueueUtils:
 
         # return the new set of transformed params
         return ret_val
+
+    @staticmethod
+    def get_formatted_date() -> str:
+        """
+        gets and returns the date in an agreeable format.
+
+        :returns string:
+        """
+        # make the timezone UTC
+        time_zone: datetime.timezone = datetime.timezone.utc
+
+        # get the appropriate formatting
+        ft: str = "%Y-%m-%dT%H:%M:%S%z"
+
+        # return the timestamp as a string
+        return datetime.datetime.now(tz=time_zone).strftime(ft)
