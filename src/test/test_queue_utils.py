@@ -21,6 +21,17 @@ test_data: list = [['test_ecflow_run_props.json', msg_tester.ecflow_expected_tra
                    ['test_hecras_run_props.json', msg_tester.hecras_expected_transformed_params]]
 
 
+def test_get_formatted_date():
+    # instantiate the utility class
+    queue_utils = QueueUtils(_queue_name='')
+
+    # get the transformed list
+    ret_val: str = queue_utils.get_formatted_date()
+
+    # check the result
+    assert ret_val.endswith('+0000')
+
+
 def test_asgs_legacy_extender():
     """
     test the transformation of run params into asgs run params
