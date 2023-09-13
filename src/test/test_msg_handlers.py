@@ -24,7 +24,8 @@ ecflow_expected_transformed_params: dict = {'physical_location': 'RENCI', 'monit
                                             'currentdate': '230206', 'currentcycle': '12', 'advisory': '2023030112', 'asgs.enstorm': 'gfsforecast',
                                             'enstorm': 'gfsforecast', 'stormname': 'none', 'forcing.tropicalcyclone.stormname': 'none',
                                             'config.coupling.waves': '0', 'forcing.tropicalcyclone.vortexmodel': 'NA',
-                                            'downloadurl': 'https://localhost/thredds/fileServer/2023/gfs/2023020612/ec95d/ht-ncfs.renci.org/ec95d/gfsforecast'}
+                                            'downloadurl':
+                                                'https://localhost/thredds/fileServer/2023/gfs/2023020612/ec95d/ht-ncfs.renci.org/ec95d/gfsforecast'}
 
 # these are the currently expected hecras params that were transformed into ASGS legacy params
 hecras_expected_transformed_params: dict = {'ADCIRCgrid': 'ec95d', 'adcirc.gridname': 'ec95d', 'advisory': '2023030112',

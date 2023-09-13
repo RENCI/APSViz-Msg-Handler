@@ -22,6 +22,11 @@ test_data: list = [['test_ecflow_run_props.json', msg_tester.ecflow_expected_tra
 
 
 def test_get_formatted_date():
+    """
+    tests the creation of a timestamp as a string
+
+    :return:
+    """
     # instantiate the utility class
     queue_utils = QueueUtils(_queue_name='')
 
