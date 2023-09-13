@@ -294,8 +294,8 @@ class QueueUtils:
         # make the timezone UTC
         time_zone: datetime.timezone = datetime.timezone.utc
 
-        # get the appropriate formatting
-        ft: str = "%Y-%m-%dT%H:%M:%S%z"
+        # get the appropriate formatting for the timestamp
+        ts_format: str = "%Y-%m-%dT%H:%M:%S%z"
 
         # return the timestamp as a string
-        return datetime.datetime.now(tz=time_zone).strftime(ft)
+        return datetime.datetime.now(tz=time_zone).strftime(ts_format)
