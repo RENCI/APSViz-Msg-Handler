@@ -33,7 +33,7 @@ def run():
     # set the app version
     app_version = os.getenv('APP_VERSION', 'Version number not set')
 
-    logger.info("Initializing ecflow_rt_run_props_msg_svc handler, version: %s.", app_version)
+    logger.info("Initializing ecflow_run_time_msg_svc handler, version: %s.", app_version)
 
     try:
         # get the queue name
