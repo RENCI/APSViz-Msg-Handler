@@ -109,8 +109,8 @@ def test_relay():
     """
     queue_utils = QueueUtils(_queue_name='test')
 
-    # test level 1, create the no-relay file
-    with open(os.path.join('../../', 'norelay'), 'x', encoding='UTF-8') as f_p:
+    # test level 1, create the no-relay file in the root of the project
+    with open(os.path.join('../../../', 'norelay'), 'x', encoding='UTF-8') as f_p:
         f_p.close()
 
     # send the msg to the queue specified
@@ -120,7 +120,7 @@ def test_relay():
     assert ret_val
 
     # remove the override relay file
-    os.remove(os.path.join('../../', 'norelay'))
+    os.remove(os.path.join('../../../', 'norelay'))
 
     # test level 2, remove one of the relay host config items
     os.environ.pop("RELAY_RABBITMQ_HOST")
