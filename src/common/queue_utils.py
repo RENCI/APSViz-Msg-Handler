@@ -171,7 +171,7 @@ class QueueUtils:
                     msg_obj = json.loads(body)
 
                     # add the relay context
-                    msg_obj |= {'relay_context': os.environ.get("SYSTEM", 'Unknown')}
+                    msg_obj |= {'relay_context': f"({os.environ.get('SYSTEM', 'Unknown')} relay)"}
 
                     # convert it back to a byte array
                     new_body = json.dumps(msg_obj).encode()
