@@ -7,7 +7,7 @@
 
 # This Dockerfile is used to build THE ASGS RabbitMQ message handler python image
 
-FROM python:3.11.4-slim
+FROM python:3.11.5-slim
 
 # install basic tools
 RUN apt-get update && apt-get -y upgrade && apt-get install -yq vim procps
