@@ -10,8 +10,9 @@
 
     Authors: Lisa Stillwell, Phil Owen @RENCI.org
 """
-import datetime
 import os
+import json
+import datetime
 from enum import Enum
 
 import pika
@@ -165,6 +166,16 @@ class QueueUtils:
                     # init the connection
                     connection = None
 
+                    # add context to this relay
+                    # first convert the incoming byte array into a json object
+                    msg_obj = json.loads(body)
+
+                    # add the relay context
+                    msg_obj |= {'relay_context': os.environ.get("SYSTEM", 'Unknown')}
+
+                    # convert it back to a byte array
+                    new_body = json.dumps(msg_obj).encode()
+
                     try:
                         # create credentials
                         credentials: pika.PlainCredentials = pika.PlainCredentials(relay_user, relay_password)
@@ -182,7 +193,7 @@ class QueueUtils:
                         channel.queue_declare(queue=self.queue_name)
 
                         # push the message to the queue
-                        channel.basic_publish(exchange='', routing_key=self.queue_name, body=body)
+                        channel.basic_publish(exchange='', routing_key=self.queue_name, body=new_body)
 
                     except Exception:
                         self.logger.exception("Error: Exception relaying message to queue: %s.", self.queue_name)
