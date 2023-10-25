@@ -42,7 +42,7 @@ class PGImplementation(PGUtilsMultiConnect):
         self.queue_utils = QueueUtils(_queue_name='', _logger=self.logger)
 
         # init the base class
-        PGUtilsMultiConnect.__init__(self, 'APSViz.Settings', db_names, _logger=self.logger, _auto_commit=_auto_commit)
+        PGUtilsMultiConnect.__init__(self, 'APSViz.Msg-Handler', db_names, _logger=self.logger, _auto_commit=_auto_commit)
 
         # load the ASGS constants into memory
         self.asgs_constants = self.build_asgs_constants()
