@@ -17,7 +17,7 @@ RUN apt-get update && apt-get upgrade
 RUN apt-get clean
 
 # set up requirements
-WORKDIR /repo/APSVIZ-Archiver
+WORKDIR /repo/APSVIZ-Msg-Handler
 
 # Normal requirements
 ADD requirements.txt .
