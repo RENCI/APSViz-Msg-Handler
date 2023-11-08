@@ -59,7 +59,7 @@ class QueueUtils:
             self.logger = LoggingUtil.init_logging("APSVIZ.Msg-Handler.QueueUtils", level=log_level, line_format='medium', log_file_path=log_path)
 
         # log the relay msg status if it has a name only
-        if self.queue_name:
+        if _queue_name:
             self.logger.info('Queue: %s handler relay enabled: %s', _queue_name, str(self.is_relay_enabled()))
 
         # declare the ECFlow and HEC/RAS target params to asgs keys mapping dict

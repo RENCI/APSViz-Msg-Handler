@@ -47,8 +47,8 @@ def test_is_enabled():
     # set the env param
     os.environ["RELAY_ENABLED"] = 'True'
 
-    # instantiate the utility class
-    queue_utils = QueueUtils(_queue_name='test')
+    # instantiate the utility class. no queue name inhibits logging
+    queue_utils = QueueUtils(_queue_name='')
 
     # get the relay status
     ret_val: str = queue_utils.is_relay_enabled()
