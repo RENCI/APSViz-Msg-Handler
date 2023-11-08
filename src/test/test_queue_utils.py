@@ -37,6 +37,45 @@ def test_get_formatted_date():
     assert ret_val.endswith('+0000')
 
 
+def test_is_enabled():
+    """
+    tests the logging of the relay enabled status
+
+    :return:
+    """
+
+    # set the env param
+    os.environ["RELAY_ENABLED"] = 'True'
+
+    # instantiate the utility class
+    queue_utils = QueueUtils(_queue_name='test')
+
+    # get the relay status
+    ret_val: str = queue_utils.is_relay_enabled()
+
+    # check the result. this is set on by default
+    assert ret_val
+
+    # unset the env param
+    os.environ["RELAY_ENABLED"] = 'False'
+
+    # instantiate the utility class
+    queue_utils = QueueUtils(_queue_name='test')
+
+    # get the relay status
+    ret_val: str = queue_utils.is_relay_enabled()
+
+    # recheck the result
+    assert not ret_val
+
+    # recheck the result with a force
+    # get the relay status
+    ret_val: str = queue_utils.is_relay_enabled(True)
+
+    # check the result. this is set on by default
+    assert ret_val
+
+
 def test_asgs_legacy_extender():
     """
     test the transformation of run params into asgs run params
