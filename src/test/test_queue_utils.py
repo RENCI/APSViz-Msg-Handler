@@ -51,7 +51,7 @@ def test_is_enabled():
     queue_utils = QueueUtils(_queue_name='')
 
     # get the relay status
-    ret_val: str = queue_utils.is_relay_enabled()
+    ret_val: bool = queue_utils.is_relay_enabled()
 
     # check the result. this is set on by default
     assert ret_val
@@ -63,14 +63,14 @@ def test_is_enabled():
     queue_utils = QueueUtils(_queue_name='test')
 
     # get the relay status
-    ret_val: str = queue_utils.is_relay_enabled()
+    ret_val: bool = queue_utils.is_relay_enabled()
 
     # recheck the result
     assert not ret_val
 
     # recheck the result with a force
     # get the relay status
-    ret_val: str = queue_utils.is_relay_enabled(True)
+    ret_val: bool = queue_utils.is_relay_enabled(True)
 
     # check the result. this is set on by default
     assert ret_val
