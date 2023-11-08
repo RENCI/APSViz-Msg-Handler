@@ -58,8 +58,9 @@ class QueueUtils:
             # create a logger
             self.logger = LoggingUtil.init_logging("APSVIZ.Msg-Handler.QueueUtils", level=log_level, line_format='medium', log_file_path=log_path)
 
-        # log the current relay msg status
-        self.logger.info('Queue: %s handler relay enabled: %s', _queue_name, str(self.is_relay_enabled()))
+        # log the relay msg status if it has a name only
+        if self.queue_name:
+            self.logger.info('Queue: %s handler relay enabled: %s', _queue_name, str(self.is_relay_enabled()))
 
         # declare the ECFlow and HEC/RAS target params to asgs keys mapping dict
         self.msg_extend_params = {'suite.physical_location': ['physical_location', 'monitoring.rmqmessaging.locationname'],
@@ -76,7 +77,6 @@ class QueueUtils:
                                      'stormname': ReformatType.UPPERCASE, 'forcing.tropicalcyclone.stormname': ReformatType.UPPERCASE}
         # save the queue name
         self.queue_name = _queue_name
-
 
     def start_consuming(self, callback):
         """
@@ -212,8 +212,7 @@ class QueueUtils:
         # return pass/fail
         return ret_val
 
-    @staticmethod
-    def is_relay_enabled(force: bool = False) -> bool:
+    def is_relay_enabled(self, force: bool = False) -> bool:
         """
         checks the env param to see if relay is enabled. note it can still be forced.
 
