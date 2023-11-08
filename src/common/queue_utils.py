@@ -69,9 +69,8 @@ class QueueUtils:
                                   'forcing.vortexmodel': ['forcing.tropicalcyclone.vortexmodel']}
 
         # declare param transformation selections
-        self.msg_transform_params = {'storm': ReformatType.INTEGER, 'stormnumber': ReformatType.MAKE_INT,
-                                     'forcing.stormname': ReformatType.UPPERCASE, 'stormname': ReformatType.UPPERCASE,
-                                     'forcing.tropicalcyclone.stormname': ReformatType.UPPERCASE}
+        self.msg_transform_params = {'storm': ReformatType.INTEGER, 'stormnumber': ReformatType.MAKE_INT, 'forcing.stormname': ReformatType.UPPERCASE,
+                                     'stormname': ReformatType.UPPERCASE, 'forcing.tropicalcyclone.stormname': ReformatType.UPPERCASE}
         # save the queue name
         self.queue_name = _queue_name
 
@@ -159,7 +158,7 @@ class QueueUtils:
             # if there is a place specified to relay a message to
             if relay_user and relay_password and relay_host:
                 # get the relay enabled flag. if force=true is passed in it will override the environment variable
-                relay_enabled: bool = os.environ.get('RELAY_ENABLED', 'False').lower() in ('true', '1', 't') or force
+                relay_enabled: bool = self.is_relay_enabled(force)
 
                 # if relay is enabled or being forced
                 if relay_enabled:
@@ -181,7 +180,8 @@ class QueueUtils:
                         credentials: pika.PlainCredentials = pika.PlainCredentials(relay_user, relay_password)
 
                         # create connection parameters
-                        parameters: pika.ConnectionParameters = pika.ConnectionParameters(relay_host, 5672, '/', credentials, socket_timeout=2)
+                        parameters: pika.ConnectionParameters = pika.ConnectionParameters(relay_host, 5672, '/', credentials,
+                                                                                          socket_timeout=2)
 
                         # get a connection to the queue
                         connection = pika.BlockingConnection(parameters)
@@ -207,6 +207,18 @@ class QueueUtils:
 
         # return pass/fail
         return ret_val
+
+    @staticmethod
+    def is_relay_enabled(force: bool = False) -> bool:
+        """
+        checks the env param to see if relay is enabled. note it can still be forced.
+
+        :param: force
+        :return:
+        """
+
+        # return the evaluation
+        return os.environ.get('RELAY_ENABLED', 'False').lower() in ('true', '1', 't') or force
 
     def extend_msg_to_asgs_legacy(self, run_params: dict) -> dict:
         """
