@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: MIT
 
 """
-    Methods to handle ASGS database activity
+    Methods to handle database activity
 
     Author: Phil Owen, RENCI.org
 """

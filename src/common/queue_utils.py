@@ -63,7 +63,7 @@ class QueueUtils:
         if _queue_name:
             self.logger.info('Queue: %s handler relay enabled: %s', _queue_name, str(self.is_relay_enabled()))
 
-        # declare the ECFlow and HEC/RAS target params to asgs keys mapping dict
+        # declare the ECFlow and HEC/RAS target params to legacy keys mapping dict
         self.msg_extend_params = {'suite.physical_location': ['physical_location', 'monitoring.rmqmessaging.locationname'],
                                   'suite.instance_name': ['instance_name', 'instancename'], 'suite.project_code': [], 'suite.uid': ['uid'],
                                   'suite.adcirc.gridname': ['ADCIRCgrid', 'adcirc.gridname'], 'time.currentdate': ['currentdate'],
@@ -115,7 +115,7 @@ class QueueUtils:
         channel: pika.adapters.blocking_connection.BlockingChannel = None
 
         try:
-            # set up AMQP credentials and connect to asgs queue
+            # set up AMQP credentials and connect to a queue
             credentials: pika.PlainCredentials = pika.PlainCredentials(os.environ.get("RABBITMQ_USER"), os.environ.get("RABBITMQ_PW"))
 
             # set up the connection parameters
@@ -213,7 +213,8 @@ class QueueUtils:
         # return pass/fail
         return ret_val
 
-    def is_relay_enabled(self, force: bool = False) -> bool:
+    @staticmethod
+    def is_relay_enabled(force: bool = False) -> bool:
         """
         checks the env param to see if relay is enabled. note it can still be forced.
 
@@ -224,20 +225,20 @@ class QueueUtils:
         # return the evaluation
         return os.environ.get('RELAY_ENABLED', 'False').lower() in ('true', '1', 't') or force
 
-    def extend_msg_to_asgs_legacy(self, run_params: dict) -> dict:
+    def extend_msg_to_legacy_equivalent(self, run_params: dict) -> dict:
         """
-        Extends params from a ECFlow message to include ASGS message legacy params
+        Maps the ECFLOW params to create legacy params
 
         :return:
         """
         # save the entire incoming dict into the return
         ret_val: dict = run_params.copy()
 
-        # go through the params, search for a target, transform it into the ASGS equivalent
+        # go through the params, search for a target, transform it into the legacy equivalent
         for key, values in self.msg_extend_params.items():
             # find this in the run params
             if key in run_params:
-                # grab the new keys from the transform asgs keys list
+                # grab the new keys from the transform legacy keys list
                 for new_key in values:
                     # add the transform key with the run props data value to the dict
                     ret_val.update({new_key: run_params[key]})
@@ -258,7 +259,7 @@ class QueueUtils:
         # init the param value
         param: str = ''
 
-        # go through the params, search for a target, transform it into the ASGS equivalent
+        # go through the params, search for a target, transform it into the legacy equivalent
         for key, value in self.msg_transform_params.items():
             # find this in the run params
             if key in run_params:

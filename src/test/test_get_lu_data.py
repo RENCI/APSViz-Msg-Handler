@@ -20,7 +20,7 @@ def test_db_connection_creation():
     :return:
     """
     # specify the DB to gain connectivity to
-    db_name: tuple = ('asgs',)
+    db_name: tuple = ('apsviz',)
 
     # create a DB connection object
     db_info = PGImplementation(db_name)
@@ -29,7 +29,7 @@ def test_db_connection_creation():
     assert len(db_info.dbs) == len(db_name)
 
     # make a db request
-    ret_val = db_info.exec_sql('asgs', 'SELECT version()')
+    ret_val = db_info.exec_sql('apsviz', 'SELECT version()')
 
     # check the data returned
     assert ret_val.startswith('PostgreSQL')
@@ -42,9 +42,9 @@ def test_get_lu_id():
     :return:
     """
     # create the DB object
-    db_names: tuple = ('asgs',)
+    db_names: tuple = ('apsviz',)
 
-    # define and init the object that will handle ASGS DB operations
+    # define and init the object that will handle DB operations
     db_info: PGImplementation = PGImplementation(db_names, _logger=None)
 
     # get a site id item
@@ -67,16 +67,16 @@ def test_get_site_ids():
     :return:
     """
     # create the DB object
-    db_names: tuple = ('asgs',)
+    db_names: tuple = ('apsviz',)
 
-    # define and init the object that will handle ASGS DB operations
+    # define and init the object that will handle DB operations
     db_info: PGImplementation = PGImplementation(db_names, _logger=None)
 
     # get the site ids
     site_ids: list = db_info.get_site_ids()
 
     # check the result
-    assert len(db_info.asgs_constants['site']) != len(site_ids)
+    assert len(db_info.legacy_constants['site']) == len(site_ids)
 
 
 def test_load_lu_data():
@@ -86,9 +86,9 @@ def test_load_lu_data():
     :return:
     """
     # create the DB object
-    db_names: tuple = ('asgs',)
+    db_names: tuple = ('apsviz',)
 
-    # define and init the object that will handle ASGS DB operations
+    # define and init the object that will handle DB operations
     db_info: PGImplementation = PGImplementation(db_names, _logger=None)
 
     # define the expected LU constant lookups
@@ -105,13 +105,13 @@ def test_load_lu_data():
                               'instance_state_type': exp_instance_state_type_lu}
 
     # create a list of target lu tables
-    lu_tables = ['ASGS_Mon_site_lu', 'ASGS_Mon_event_type_lu', 'ASGS_Mon_state_type_lu', 'ASGS_Mon_instance_state_type_lu']
+    lu_tables = ['site_lu', 'event_type_lu', 'state_type_lu', 'instance_state_type_lu']
 
     # init the lu_data storage
     lu_data: dict = {}
 
     # make the call to get the data
     for lu_item in lu_tables:
-        lu_data.update({lu_item.removeprefix('ASGS_Mon_').removesuffix('_lu'): db_info.get_lu_items(lu_item)})
+        lu_data.update({lu_item.removesuffix('_lu'): db_info.get_lu_items(lu_item)})
 
     assert lu_data == expected_lu_data
