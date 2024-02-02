@@ -77,9 +77,9 @@ def test_is_enabled():
     assert ret_val
 
 
-def test_asgs_legacy_extender():
+def test_legacy_extender():
     """
-    test the transformation of run params into asgs run params
+    test the transformation of run params into legacy params
 
     :return:
     """
@@ -93,8 +93,8 @@ def test_asgs_legacy_extender():
             # instantiate the utility class
             queue_utils = QueueUtils(_queue_name='')
 
-            # get the transformed list
-            ret_val = queue_utils.extend_msg_to_asgs_legacy(run_props)
+            # map the ECFLOW params to create legacy params
+            ret_val = queue_utils.extend_msg_to_legacy_equivalent(run_props)
 
             # add in the expected transformations. use the same expected params declared in the msg handler test
             run_props.update(test_datum[1])
@@ -139,7 +139,7 @@ def test_relay():
     tests the message relay method
 
     there is a matrix of possible conditions here:
-        level 1: A 'norelay' file can exist or not. when file exists it will stop all relaying.
+        level 1: A 'norelay' file can exist or not. when the file exists, it will stop all relaying.
         Level 2: RELAY host information (3 env params) must exist
         Level 3: RELAY_ENABLED environment param can be true/false or
                  force (true/false) can be passed to the relay call that can override RELAY_ENABLED
@@ -154,7 +154,7 @@ def test_relay():
         f_p.close()
 
     # send the msg to the queue specified
-    ret_val: bool = queue_utils.relay_msg(b'test')
+    ret_val: bool = queue_utils.relay_msg(b'{"test": "test"}')
 
     # check the result
     assert ret_val
@@ -166,7 +166,7 @@ def test_relay():
     os.environ.pop("RELAY_RABBITMQ_HOST")
 
     # send the msg to the queue specified
-    ret_val: bool = queue_utils.relay_msg(b'test')
+    ret_val: bool = queue_utils.relay_msg(b'{"test": "test"}')
 
     # check the result
     assert ret_val
@@ -178,14 +178,27 @@ def test_relay():
     os.environ['RELAY_ENABLED'] = 'false'
 
     # send the msg to the queue specified
-    ret_val: bool = queue_utils.relay_msg(b'test')
+    ret_val: bool = queue_utils.relay_msg(b'{"test": "test"}')
 
     # check the result
     assert ret_val
 
     # test level 3, part 2. this should actually let the relay occur
-    # but because of bogus relay host values this will throw an exception and return false
-    ret_val: bool = queue_utils.relay_msg(b'test', True)
+    # but because of bogus relay host values, this will throw an exception and return false
+    ret_val: bool = queue_utils.relay_msg(b'{"test": "test"}', True)
 
     # check the result
     assert not ret_val
+
+    # replace the relay host config items
+    os.environ['RELAY_RABBITMQ_HOST'] = 'localhost'
+
+    # test level 3, part 1. disable the relay, call the method with force off
+    os.environ['RELAY_ENABLED'] = 'True'
+
+    # finally, post a msg to a test queue. this presumes that the MQ port has been forwarded locally
+    # don't forget to remove the queue upon successful posting
+    ret_val: bool = queue_utils.relay_msg(b'{"test": "test"}', True)
+
+    # check the result
+    assert ret_val

@@ -45,8 +45,8 @@ class PGImplementation(PGUtilsMultiConnect):
         # init the base class
         PGUtilsMultiConnect.__init__(self, 'APSViz.Msg-Handler', db_names, _logger=self.logger, _auto_commit=_auto_commit)
 
-        # load the ASGS constants into memory
-        self.asgs_constants = self.build_asgs_constants()
+        # load the legacy constants into memory
+        self.legacy_constants = self.build_constants()
 
     def __del__(self):
         """
@@ -57,21 +57,21 @@ class PGImplementation(PGUtilsMultiConnect):
         # clean up connections and cursors
         PGUtilsMultiConnect.__del__(self)
 
-    def build_asgs_constants(self) -> dict:
+    def build_constants(self) -> dict:
         """
-        builds the in-memory data for asgs constants.
+        builds the in-memory data for legacy constants.
 
         :return:
         """
         # create a list of target lu tables
-        lu_tables = ['ASGS_Mon_site_lu', 'ASGS_Mon_event_type_lu', 'ASGS_Mon_state_type_lu', 'ASGS_Mon_instance_state_type_lu']
+        lu_tables = ['site_lu', 'event_type_lu', 'state_type_lu', 'instance_state_type_lu']
 
         # init the lu_data storage
         lu_data: dict = {}
 
         # make the call to get the data
         for lu_item in lu_tables:
-            lu_data.update({lu_item.removeprefix('ASGS_Mon_').removesuffix('_lu'): self.get_lu_items(lu_item)})
+            lu_data.update({lu_item.removeprefix('').removesuffix('_lu'): self.get_lu_items(lu_item)})
 
         # add in the pct_complete items
         lu_data.update(
@@ -94,7 +94,7 @@ class PGImplementation(PGUtilsMultiConnect):
         sql_stmt = f"SELECT * FROM public.get_lu_items(lu_name := '{lu_name}')"
 
         # get the data
-        lu_data = self.exec_sql('asgs', sql_stmt)
+        lu_data = self.exec_sql('apsviz', sql_stmt)
 
         # check the return
         if lu_data != -1:
@@ -139,7 +139,7 @@ class PGImplementation(PGUtilsMultiConnect):
         :return:
         """
         # get the ID
-        ret_id = self.asgs_constants[lu_name].get(element_name, -1)
+        ret_id = self.legacy_constants[lu_name].get(element_name, -1)
 
         # did we find something
         if ret_id >= 0:
@@ -152,12 +152,12 @@ class PGImplementation(PGUtilsMultiConnect):
 
     def get_site_ids(self) -> list:
         """
-        gets the list of site ids for the ASGS run properties message handler
+        gets the list of site ids for the run properties message handler
 
         :return:
         """
         # return the list of ids
-        return [value for key, value in self.asgs_constants['site'].items()]
+        return [value for key, value in self.legacy_constants['site'].items()]
 
     def get_existing_event_group_id(self, instance_id, advisory_id, context: str = 'unknown'):
         """
@@ -172,9 +172,9 @@ class PGImplementation(PGUtilsMultiConnect):
 
         # see if there are any event groups yet that have this instance_id
         # this could be caused by a new install that does not have any data in the DB yet
-        sql_stmt = f"SELECT id FROM \"ASGS_Mon_event_group\" WHERE instance_id={instance_id} AND advisory_id='{advisory_id}' ORDER BY id DESC"
+        sql_stmt = f"SELECT id FROM \"event_group\" WHERE instance_id={instance_id} AND advisory_id='{advisory_id}' ORDER BY id DESC"
 
-        group = self.exec_sql('asgs', sql_stmt)
+        group = self.exec_sql('apsviz', sql_stmt)
 
         if group > 0:
             existing_group_id = group
@@ -204,14 +204,14 @@ class PGImplementation(PGUtilsMultiConnect):
 
         # see if there are any instances yet that have this site_id and instance_name
         # this could be caused by a new install that does not have any data in the DB yet
-        sql_stmt = f"SELECT id FROM \"ASGS_Mon_instance\" WHERE site_id={site_id} AND process_id={process_id} AND instance_name='{instance_name}' " \
+        sql_stmt = f"SELECT id FROM \"instance\" WHERE site_id={site_id} AND process_id={process_id} AND instance_name='{instance_name}' " \
                    f"AND inst_state_type_id!=9"
 
         # +++++++++++++++FIX THIS++++++++++++++++++++Add query to get correct stat id for Defunct++++++++++++++++++++++++
         # +++++++++++++++FIX THIS++++++++++++++++++++Add day to query too? (to account for rollover of process ids)++++++++++++++++++++++++
 
         # get the instance id if it exists
-        inst = self.exec_sql('asgs', sql_stmt)
+        inst = self.exec_sql('apsviz', sql_stmt)
 
         # any int > 0 is a valid instance id
         if inst > 0:
@@ -241,10 +241,10 @@ class PGImplementation(PGUtilsMultiConnect):
         self.logger.debug("start_ts: %s, site_id: %s, process_id: %s, instance_name: %s", start_ts, site_id, process_id, instance_name)
 
         # build up the sql statement to
-        sql_stmt = f"SELECT id FROM \"ASGS_Mon_instance\" WHERE CAST(start_ts as DATE)='{start_ts[:10]}' AND site_id={site_id} AND " \
+        sql_stmt = f"SELECT id FROM \"instance\" WHERE CAST(start_ts as DATE)='{start_ts[:10]}' AND site_id={site_id} AND " \
                    f"process_id={process_id} AND instance_name='{instance_name}'"
 
-        inst = self.exec_sql('asgs', sql_stmt)
+        inst = self.exec_sql('apsviz', sql_stmt)
 
         if inst is not None:
             _id = inst
@@ -271,10 +271,10 @@ class PGImplementation(PGUtilsMultiConnect):
         advisory_id = msg_obj.get("advisory_number", "N/A") if (msg_obj.get("advisory_number", "N/A") != "") else "N/A"
 
         # build up the sql statement to update the event group
-        sql_stmt = f"UPDATE \"ASGS_Mon_event_group\" SET state_type_id ={state_id}, storm_name='{storm_name}', advisory_id='{advisory_id}' " \
+        sql_stmt = f"UPDATE \"event_group\" SET state_type_id ={state_id}, storm_name='{storm_name}', advisory_id='{advisory_id}' " \
                    f"WHERE id={event_group_id} RETURNING 1"
 
-        self.exec_sql('asgs', sql_stmt)
+        self.exec_sql('apsviz', sql_stmt)
 
     def update_instance(self, state_id, site_id, instance_id, msg_obj):
         """
@@ -296,24 +296,10 @@ class PGImplementation(PGUtilsMultiConnect):
         run_params = msg_obj.get("run_params", "N/A") if (msg_obj.get("run_params", "N/A") != "") else "N/A"
 
         # build up the sql statement to update the instance
-        sql_stmt = f"UPDATE \"ASGS_Mon_instance\" SET inst_state_type_id = {state_id}, end_ts = '{end_ts}', run_params = '{run_params}' " \
+        sql_stmt = f"UPDATE \"instance\" SET inst_state_type_id = {state_id}, end_ts = '{end_ts}', run_params = '{run_params}' " \
                    f"WHERE site_id = {site_id} AND id={instance_id} RETURNING 1"
 
-        self.exec_sql('asgs', sql_stmt)
-
-    def save_raw_msg(self, msg):
-        """
-        saves the raw message
-
-        :param msg:
-        :return:
-        """
-        self.logger.debug("msg: %s", msg)
-
-        # build up the sql statement to insert the json data
-        sql_stmt = f"INSERT INTO \"ASGS_Mon_json\" (data) VALUES ('{msg}') RETURNING 1"
-
-        self.exec_sql('asgs', sql_stmt)
+        self.exec_sql('apsviz', sql_stmt)
 
     def insert_event(self, site_id, event_group_id, event_type_id, msg_obj, context: str = 'unknown'):
         """
@@ -356,11 +342,11 @@ class PGImplementation(PGUtilsMultiConnect):
             msg_line = ''
 
         # create the fields
-        sql_stmt = 'INSERT INTO "ASGS_Mon_event" (site_id, event_group_id, event_type_id, event_ts, advisory_id, pct_complete, sub_pct_complete, ' \
+        sql_stmt = 'INSERT INTO "event" (site_id, event_group_id, event_type_id, event_ts, advisory_id, pct_complete, sub_pct_complete, ' \
                    f"process{raw_data_col}) VALUES ({site_id}, {event_group_id}, {event_type_id}, '{event_ts}', '{advisory_id}', {pct_complete}, " \
                    f"{sub_pct_complete}, '{process}'{msg_line}) RETURNING 1"
 
-        self.exec_sql('asgs', sql_stmt)
+        self.exec_sql('apsviz', sql_stmt)
 
     def insert_event_group(self, state_id, instance_id, msg_obj, context: str = 'unknown'):
         """
@@ -387,12 +373,12 @@ class PGImplementation(PGUtilsMultiConnect):
         advisory_id = msg_obj.get("advisory_number", "N/A") if (msg_obj.get("advisory_number", "N/A") != "") else "N/A"
 
         # build up the sql statement to insert the event
-        sql_stmt = 'INSERT INTO "ASGS_Mon_event_group" (state_type_id, instance_id, event_group_ts, storm_name, storm_number, advisory_id, ' \
+        sql_stmt = 'INSERT INTO "event_group" (state_type_id, instance_id, event_group_ts, storm_name, storm_number, advisory_id, ' \
                    f"final_product) VALUES ({state_id}, {instance_id}, '{event_group_ts}', '{storm_name}', '{storm_number}', '{advisory_id}'" \
                    f", 'product') RETURNING id"
 
         # get the new event group id
-        group = self.exec_sql('asgs', sql_stmt)
+        group = self.exec_sql('apsviz', sql_stmt)
 
         self.logger.debug("group: %s, context: %s", group, context)
 
@@ -430,11 +416,11 @@ class PGImplementation(PGUtilsMultiConnect):
         # if (instance_id < 0):
 
         # build up the sql statement to insert the run instance
-        sql_stmt = f"INSERT INTO \"ASGS_Mon_instance\" (site_id, process_id, start_ts, end_ts, run_params, instance_name, inst_state_type_id) " \
+        sql_stmt = f"INSERT INTO \"instance\" (site_id, process_id, start_ts, end_ts, run_params, instance_name, inst_state_type_id) " \
                    f"VALUES ({site_id}, {process_id}, '{start_ts}', '{end_ts}', '{run_params}', '{instance_name}', {state_id}) RETURNING id"
 
         # insert the record and the new instance id
-        instance_id = self.exec_sql('asgs', sql_stmt)
+        instance_id = self.exec_sql('apsviz', sql_stmt)
 
         self.logger.debug("instance_id: %s, context: %s", instance_id, context)
 
@@ -477,18 +463,18 @@ class PGImplementation(PGUtilsMultiConnect):
                 self.logger.debug("uid: %s", uid)
 
                 # build up the sql to remove old entries
-                sql_stmt = f"DELETE FROM public.\"ASGS_Mon_config_item\" WHERE instance_id = {instance_id} AND uid = '{uid}' RETURNING 1"
+                sql_stmt = f"DELETE FROM public.\"config_item\" WHERE instance_id = {instance_id} AND uid = '{uid}' RETURNING 1"
 
                 self.logger.debug("sql_stmt: %s", sql_stmt)
 
                 # remove all duplicate records that may already exist
-                self.exec_sql('asgs', sql_stmt)
+                self.exec_sql('apsviz', sql_stmt)
 
                 # get the list of values
                 values_list = [f"({instance_id}, '{uid}', '{k}', '{v}')" for (k, v) in params.items()]
 
                 # create a massive insert statement
-                sql_stmt = f"INSERT INTO public.\"ASGS_Mon_config_item\" (instance_id, uid, key, value) VALUES {','.join(values_list)}"
+                sql_stmt = f"INSERT INTO public.\"config_item\" (instance_id, uid, key, value) VALUES {','.join(values_list)}"
 
                 # insure this call returns a value
                 sql_stmt += " RETURNING 1"
@@ -496,7 +482,7 @@ class PGImplementation(PGUtilsMultiConnect):
                 self.logger.debug("sql_stmt: %s", sql_stmt)
 
                 # execute the sql
-                self.exec_sql('asgs', sql_stmt)
+                self.exec_sql('apsviz', sql_stmt)
 
         except Exception:
             ret_msg = "Exception inserting config items"
