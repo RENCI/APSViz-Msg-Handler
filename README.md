@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
 
 # APSViz RabbitMQ Message Handler
 RabbitMQ message handlers for the APSViz project, including handlers for:
- - The ASGS run-time status and run properties queues
+ - The ECFLOW run-time status and run properties queues
  - The ECFLOW run-time status and run properties queues
  - The HEC/RAS queue
 
