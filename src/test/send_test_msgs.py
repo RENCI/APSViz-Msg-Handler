@@ -18,20 +18,19 @@ from src.common.queue_utils import QueueUtils
 
 
 if __name__ == '__main__':
-    """
-    entry point to post a message to the a rabbit MQ with the parameters specified on the command line
-    
-    use this SQL to generate legit test json data: 
-    
-    select jsonb_object_agg(i.key, i.value) from
-    (
-        select c.key, c.value
-        from config_item c
-        where instance_id=<> and uid='<>'
-        and key like '%.%'
-    ) i;
-    
-    """
+    # entry point to post a message to the a rabbit MQ with the parameters specified on the command line
+    #
+    # use this SQL to generate legit test json data:
+    #
+    # select jsonb_object_agg(i.key, i.value) from
+    # (
+    #     select c.key, c.value
+    #     from config_item c
+    #     where instance_id=<> and uid='<>'
+    #     and key like '%.%'
+    # ) i;
+    #
+
     # main entry point for the rule run.
 
     # create a command line parser
